@@ -1,0 +1,235 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.PriorityQueue;
+
+public class ModifiedDijkstras {
+    private static final int NOTOPTIONAL = -1;
+
+    static final class OutEdge {
+        private int destination;
+        private int weight;
+        private int optionalEdgeNo;
+
+        public OutEdge(int destination, int weight, int optionalEdgeNo) {
+            this.destination = destination;
+            this.weight = weight;
+            this.optionalEdgeNo = optionalEdgeNo;
+        }
+
+        public boolean isOptionalEdge() {
+            return optionalEdgeNo != -1;
+        }
+    }
+
+    static final class shortestPathDesc {
+        int optionalEdgeNo;
+        int cost;
+
+        public shortestPathDesc(int optionalEdgeNo, int cost) {
+            this.optionalEdgeNo = optionalEdgeNo;
+            this.cost = cost;
+        }
+
+    }
+
+    private static PriorityQueue<ProgrammingAssignment1.shortestPathDesc> getAllShortestPaths(
+            int n, int source, int target, ArrayList<ArrayList<OutEdge>> adjList) {
+        PriorityQueue<ProgrammingAssignment1.OutEdge> minHeap = new PriorityQueue<ProgrammingAssignment1.OutEdge>(
+                11, new java.util.Comparator<OutEdge>() {
+                    @Override
+                    public int compare(OutEdge o1, OutEdge o2) {
+                        return o1.weight - o2.weight;
+                    }
+                });
+
+        @SuppressWarnings("unchecked")
+        HashSet<Integer>[] visitedSet = new HashSet[n];
+        for (int i = 0; i < n; ++i) {
+            visitedSet[i] = new HashSet<Integer>();
+        }
+
+        PriorityQueue<ProgrammingAssignment1.shortestPathDesc> shortestPaths = new PriorityQueue<ProgrammingAssignment1.shortestPathDesc>(
+                11,
+                new java.util.Comparator<ProgrammingAssignment1.shortestPathDesc>() {
+
+                    @Override
+                    public int compare(shortestPathDesc o1, shortestPathDesc o2) {
+                        return o1.cost - o2.cost;
+                    }
+
+                });
+        HashSet<Integer> shortestPathFound = new HashSet<Integer>();
+        minHeap.add(new OutEdge(source, 0, NOTOPTIONAL));
+
+        while (!minHeap.isEmpty()) {
+
+            OutEdge currentEdge = minHeap.poll();
+            int currentVertex = currentEdge.destination;
+            int currentEdgeOptionalNo = currentEdge.optionalEdgeNo;
+            int currentCumulativeWeight = currentEdge.weight;
+
+            if ((currentVertex == target)
+                    && (!shortestPathFound.contains(currentEdgeOptionalNo))) {
+                shortestPathFound.add(currentEdgeOptionalNo);
+                shortestPaths.add(new shortestPathDesc(currentEdgeOptionalNo,
+                        currentCumulativeWeight));
+            } else if (visitedSet[currentVertex].add(currentEdgeOptionalNo)) {
+                ArrayList<OutEdge> adjacentVertexList = adjList
+                        .get(currentVertex);
+                if (currentEdge.isOptionalEdge()) {
+                    for (int i = 0, iLen = adjacentVertexList.size(); i < iLen; ++i) {
+                        OutEdge curAdj = adjacentVertexList.get(i);
+                        if (!curAdj.isOptionalEdge()) {
+                            minHeap.add(new OutEdge(curAdj.destination,
+                                    currentCumulativeWeight + curAdj.weight,
+                                    currentEdge.optionalEdgeNo));
+                        }
+                    }
+                } else {
+
+                    for (int i = 0, iLen = adjacentVertexList.size(); i < iLen; ++i) {
+                        OutEdge curAdj = adjacentVertexList.get(i);
+                        minHeap.add(new OutEdge(curAdj.destination,
+                                currentCumulativeWeight + curAdj.weight,
+                                curAdj.optionalEdgeNo));
+                    }
+
+                }
+            }
+
+        }
+
+        return shortestPaths;
+    }
+
+    public static void main(String[] args) throws Exception {
+        ArrayList<ArrayList<OutEdge>> adjList = new ArrayList<ArrayList<OutEdge>>();
+        BufferedReader input = new BufferedReader(new InputStreamReader(
+                System.in));
+        PrintWriter consoleOut = new PrintWriter(new OutputStreamWriter(
+                System.out), true);
+        
+        /* Start of Getting Input */
+        consoleOut.println("Enter choice of input(1.Console Input | 2.File Input)");
+        int choice = Integer.parseInt(input.readLine());
+        boolean isFileIP = false;
+        String ipFileName = null;
+        while ((choice != 1 && choice != 2)) {
+            consoleOut.println("Wrong choice, please re-enter");
+            consoleOut.println("Console Input - 1\nFile Input - 2");
+            choice = Integer.parseInt(input.readLine());
+        }
+
+        if (choice == 2) {
+            consoleOut.println("Enter file name : ");
+            ipFileName = input.readLine();
+            input = new BufferedReader(new InputStreamReader(
+                    new FileInputStream(new File(ipFileName))));
+            isFileIP = true;
+        }
+
+        int n = Integer.parseInt(input.readLine());
+        for (int i = 0; i < n; ++i) {
+            adjList.add(new ArrayList<OutEdge>());
+        }
+
+        int m = Integer.parseInt(input.readLine());
+        for (int i = 0; i < m; ++i) {
+            String currentRow = input.readLine();
+            String currentVals[] = currentRow.split(":");
+            OutEdge temp = new OutEdge(Integer.parseInt(currentVals[1]),
+                    Integer.parseInt(currentVals[2]), NOTOPTIONAL);
+            ArrayList<OutEdge> currentVertex = adjList.get(Integer
+                    .parseInt(currentVals[0]));
+            currentVertex.add(temp);
+        }
+
+        HashMap<Integer, String> optionalEdgeMap = new HashMap<Integer, String>();
+        optionalEdgeMap.put(-1, "Using Pre-Existing Edges");
+
+        int k = Integer.parseInt(input.readLine());
+        for (int i = 0; i < k; ++i) {
+            String currentRow = input.readLine();
+            String currentVals[] = currentRow.split(":");
+            OutEdge temp = new OutEdge(Integer.parseInt(currentVals[1]),
+                    Integer.parseInt(currentVals[2]), i);
+            ArrayList<OutEdge> currentVertex = adjList.get(Integer
+                    .parseInt(currentVals[0]));
+            currentVertex.add(temp);
+            String edgeString = currentVals[0] + " --> " + currentVals[1];
+            optionalEdgeMap.put(i, edgeString);
+        }
+
+        int source = Integer.parseInt(input.readLine());
+        int target = Integer.parseInt(input.readLine());
+
+        /* End Getting Input */
+        
+        PriorityQueue<ProgrammingAssignment1.shortestPathDesc> shortestPaths = getAllShortestPaths(
+                n, source, target, adjList);
+
+        if (!isFileIP) {
+            printOutput(consoleOut, optionalEdgeMap, shortestPaths);
+        } else {
+            String opFileName = ipFileName + "_op.txt";
+            consoleOut.println("Output has been printed to file : "
+                    + opFileName);
+            PrintWriter fileOut = new PrintWriter(new OutputStreamWriter(
+                    new FileOutputStream(new File(opFileName))));
+            printOutput(fileOut, optionalEdgeMap, shortestPaths);
+            fileOut.flush();
+            fileOut.close();
+        }
+        input.close();
+        consoleOut.flush();
+        consoleOut.close();
+
+    }
+
+    public static void printOutput(PrintWriter out,
+            HashMap<Integer, String> optionalEdgeMap,
+            PriorityQueue<shortestPathDesc> shortestPaths) {
+
+        if (shortestPaths.size() == 0) {
+            out.println("Shortest Path cannot be found");
+        } else {
+            int edgeCount = 0;
+            boolean notOptionalVisited = false;
+			out.println("EDGE INFO : SHORTEST PATH LENGTH");
+            while (shortestPaths.size() != 0) {
+                shortestPathDesc shortest = shortestPaths.poll();
+                if (shortest.optionalEdgeNo == NOTOPTIONAL) {
+                    notOptionalVisited = true;
+                    if (edgeCount == 0) {
+                        out.println(optionalEdgeMap
+                                .get(shortest.optionalEdgeNo)
+                                + " : "
+                                + shortest.cost);
+                        out.println("No further Roads can be built to reduce shortest path s-t length");
+                        break;
+                    } else {
+                        out.println("Above listed edge(s) can be used to shorten the length of the shortest path s-t");
+                        out.println("Shortest path s-t length with using only pre-existing roads : "
+                                + shortest.cost);
+                        break;
+                    }
+                } else {
+                    out.println(optionalEdgeMap.get(shortest.optionalEdgeNo)
+                            + " : " + shortest.cost);
+                    edgeCount++;
+                }
+            }
+            if (!notOptionalVisited) {
+                out.println("There is no path between given source and target cities using only pre-existing roads");
+            }
+        }
+    }
+}
