@@ -550,6 +550,7 @@ public class CustomLinkedList<T extends Number & Comparable<T>> {
 	}
 	
 	//getting the loopsize - a variation
+	//logic, using the same slowpointer fastpointer approach, the loopsize is the no of steps taken by either of the pointers when they collide
 	public int getLoopSizeInCircularLinkedListSmart(){
 		Node<T> slowRunner = this.getHead();
 		Node<T> fastRunner = this.getHead();
