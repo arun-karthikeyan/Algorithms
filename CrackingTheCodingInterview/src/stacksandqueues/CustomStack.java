@@ -50,7 +50,13 @@ public class CustomStack<T> extends StackADT<T> {
 		return size==0;
 	}
 	public String toString(){
-		return top.toString();
+		if(top!=null)
+		{
+			return top.toString();
+		}
+		else{
+			return null;
+		}
 	}
 	public int size(){
 		return this.size;
