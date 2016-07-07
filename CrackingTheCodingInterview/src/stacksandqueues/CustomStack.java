@@ -57,17 +57,17 @@ public class CustomStack<T> extends StackADT<T> {
 	}
 	
 	public static void main(String[] args) throws Exception{
-		CustomStack<Integer> q = new CustomStack<Integer>();
-		q.push(1);
-		q.push(2);
-		q.push(3);
-		System.out.println(q);
-		System.out.println("removing top : "+q.pop());
-		q.push(4);
-		q.push(5);
-		System.out.println(q);
-		System.out.println("peeking current top : "+q.peek());
-		System.out.println(q);
+		CustomStack<Integer> s = new CustomStack<Integer>();
+		s.push(1);
+		s.push(2);
+		s.push(3);
+		System.out.println(s);
+		System.out.println("removing top : "+s.pop());
+		s.push(4);
+		s.push(5);
+		System.out.println(s);
+		System.out.println("peeking current top : "+s.peek());
+		System.out.println(s);
 		
 	}
 
