@@ -45,7 +45,13 @@ public class BinaryMaxHeap<T extends Comparable<T>> {
 			idx>>=1;
 		}
 	}
-	
+	public T peek() throws Exception{
+		if(isEmpty()){
+			throw new Exception("Empty Heap Exception");
+		}
+		
+		return this.heap.get(1).value;
+	}
 	public T remove() throws Exception{
 		if(isEmpty()){
 			throw new Exception("Empty Heap Exception");
