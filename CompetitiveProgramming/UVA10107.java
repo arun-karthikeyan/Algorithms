@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.PriorityQueue;
 
 public class UVA10107 {
@@ -11,14 +12,8 @@ public class UVA10107 {
 //		BufferedReader br = new BufferedReader(new FileReader("testip.txt"));
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
 		String no;
+		PriorityQueue<Integer> q1 = new PriorityQueue<Integer>(Collections.reverseOrder());
 		PriorityQueue<Integer> q2 = new PriorityQueue<Integer>();
-		PriorityQueue<Integer> q1 = new PriorityQueue<Integer>(new java.util.Comparator<Integer>() {
-			@Override
-			public int compare(Integer arg0, Integer arg1) {
-				// TODO Auto-generated method stub
-				return arg1-arg0;
-			}
-		});
 		int currentNo;
 		if ((no = br.readLine()) != null) {
 			currentNo = Integer.parseInt(no.trim());
