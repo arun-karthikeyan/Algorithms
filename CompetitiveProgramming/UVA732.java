@@ -38,7 +38,7 @@ public class UVA732 {
 		}
 		if(idx<len){
 			stack.push(str.charAt(idx));
-			printPossible(idx+1, str, len, stack, hash, fp, idx==0?"i":path+" i", pw);
+			printPossible(idx+1, str, len, stack, hash, fp, path+" i", pw);
 			stack.pop();
 		}
 		if(!stack.isEmpty()){
@@ -112,8 +112,11 @@ public class UVA732 {
 			//anagrams check is slower
 //			if(str.length()==str2.length() && isAnagram(str.toLowerCase(), str2.toLowerCase())){
 			if(str.length()==str2.length()){
-//				printPossible(0, str, str2, str.length(), new Stack<Character>(), "", "", pw);
-				printPossible(0, str, str.length(), new Stack<Character>(), 0, generateRabinKarpFP(str2), "", pw);
+//				printPossible(0, str, str2, str.length(), new Stack<Character>(), "", "", pw); //without rbf
+				/*Stack<Character> tempStack = new Stack<Character>();
+				tempStack.push(str.charAt(0));
+				printPossible(1, str, str.length(), tempStack, 0, generateRabinKarpFP(str2), "i", pw); //weirdly takes a lil more time
+*/				printPossible(0, str, str.length(), new Stack<Character>(), 0, generateRabinKarpFP(str2), "", pw);
 			}
 			pw.println("]");
 		}
