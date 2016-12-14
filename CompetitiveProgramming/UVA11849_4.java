@@ -4,10 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.TreeSet;
 
-public class UVA11849_2 {
+public class UVA11849_4 {
 private static int totalchars = 0, offset = 0;
 private static InputStream stream;
 private static byte[] buffer = new byte[1024];
@@ -96,13 +95,29 @@ public static void main(String[] args) throws Exception {
 	int n,m;
 	while((n=readInt())!=0 && (m=readInt())!=0){
 		int count = 0;
-		int[] jack = new int[n];
+		if((n-m)>1000){
+		TreeSet<Integer> jack = new TreeSet<Integer>();
 		for(int i=0; i<n; ++i){
-			jack[i] = readInt();
+			jack.add(readInt());
 		}
 		for(int i=0; i<m; ++i){
-			if(Arrays.binarySearch(jack, readInt())>=0){
+			if(jack.contains(readInt())){
 				count++;
+			}
+		}
+		}else{
+			TreeSet<Integer> jill = new TreeSet<Integer>();
+			int[] jack = new int[n];
+			for(int i=0; i<n; ++i){
+				jack[i] = readInt();
+			}
+			for(int i=0; i<m; ++i){
+				jill.add(readInt());
+			}
+			for(int i=0; i<n; ++i){
+				if(jill.contains(jack[i])){
+					count++;
+				}
 			}
 		}
 		pw.println(count);

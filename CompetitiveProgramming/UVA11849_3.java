@@ -4,10 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.BitSet;
 
-public class UVA11849_2 {
+public class UVA11849_3 {
 private static int totalchars = 0, offset = 0;
 private static InputStream stream;
 private static byte[] buffer = new byte[1024];
@@ -96,15 +95,16 @@ public static void main(String[] args) throws Exception {
 	int n,m;
 	while((n=readInt())!=0 && (m=readInt())!=0){
 		int count = 0;
-		int[] jack = new int[n];
+		BitSet jack = new BitSet();
 		for(int i=0; i<n; ++i){
-			jack[i] = readInt();
+			jack.set(readInt());
 		}
 		for(int i=0; i<m; ++i){
-			if(Arrays.binarySearch(jack, readInt())>=0){
+			if(jack.get(readInt())){
 				count++;
 			}
 		}
+		
 		pw.println(count);
 	}
 
