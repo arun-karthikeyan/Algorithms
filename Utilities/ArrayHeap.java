@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 
 public class ArrayHeap<E extends Comparable<E>> {
@@ -22,6 +23,18 @@ public class ArrayHeap<E extends Comparable<E>> {
 	public ArrayHeap(int heapType) {
 		this(heapType, 10);
 	}
+	
+	public ArrayHeap(int heapType, ArrayList<E> elements){
+		this.comp = heapType==ArrayHeap.MINHEAP?this.ascendingComparator:this.ascendingComparator.reversed();
+		this.heap = elements;
+		heapify();
+	}
+	
+	public ArrayHeap(ArrayList<E> elements, Comparator<E> customComparator){
+		this.comp = customComparator;
+		this.heap = elements;
+		heapify();
+	}
 
 	public ArrayHeap(int initialCapacity, Comparator<E> customComparator) {
 		this.heap = new ArrayList<E>(initialCapacity);
@@ -44,7 +57,7 @@ public class ArrayHeap<E extends Comparable<E>> {
 			E toReturn = peek();
 			if (heap.size() > 1) {
 				heap.set(0, heap.remove(heap.size() - 1));
-				siftDown();
+				siftDown(0, heap.size() - 1);
 			} else {
 				heap.remove(0);
 			}
@@ -58,6 +71,13 @@ public class ArrayHeap<E extends Comparable<E>> {
 		bubbleUp();
 	}
 
+	private void heapify(){
+		int size = this.heap.size()-1, lastParent = (size-1)/2;
+		for(int i=lastParent; i>=0; --i){
+			siftDown(i, size);
+		}
+	}
+	
 	private void bubbleUp() {
 		int idx = heap.size() - 1;
 		while (idx > 0) {
@@ -78,13 +98,16 @@ public class ArrayHeap<E extends Comparable<E>> {
 		heap.set(idx2, temp);
 	}
 
-	private void siftDown() {
-		int idx = 0, size = heap.size(), lastParent = (heap.size()-1)/2;
-		while (idx<lastParent) {
+	private void siftDown(int start, int end) {
+		if(end==0){
+			return;
+		}
+		int idx = start, lastParent = (end - 1) / 2;
+		while (idx <= lastParent) {
 			int lChild = idx * 2 + 1;
 			int rChild = lChild + 1;
 			E idxElement = heap.get(idx), lChildElement = heap.get(lChild);
-			if (rChild < size) {
+			if (rChild <= end) {
 				E rChildElement = heap.get(rChild);
 				int leftRightCompare = this.comp.compare(lChildElement, rChildElement);
 				if (leftRightCompare < 0) {
@@ -115,39 +138,43 @@ public class ArrayHeap<E extends Comparable<E>> {
 			}
 		}
 	}
-	
-	public int size(){
+
+	public int size() {
 		return this.heap.size();
 	}
-	public String toString(){
+
+	public String toString() {
 		return this.heap.toString();
 	}
-	public boolean isEmpty(){
+
+	public boolean isEmpty() {
 		return this.heap.isEmpty();
 	}
-	public static void main(String[] args){
-		ArrayHeap<Integer> minHeap = new ArrayHeap<>(ArrayHeap.MAXHEAP);
-		int N = (int)1e6;
-		int MAX = N*100;
-		int elements[] = new int[N];
-		for(int i=0; i<N; ++i){
-//			elements[i] = i;
-			elements[i] = (int)(Math.random()*MAX);
+
+	public static void main(String[] args) {
+		ArrayHeap<Integer> minHeap = new ArrayHeap<>(ArrayHeap.MINHEAP);
+		int N = (int) 10;
+		int MAX = N * 100;
+		Integer elements[] = new Integer[N];
+		for (int i = 0; i < N; ++i) {
+			// elements[i] = i;
+			elements[i] = (int) (Math.random() * MAX);
 		}
 		long start = System.currentTimeMillis();
-		for(int i=0; i<N; ++i){
-			minHeap.add(elements[i]);
-		}
+//		for (int i = 0; i < N; ++i) {
+//			minHeap.add(elements[i]);
+//		}
+		minHeap = new ArrayHeap<Integer>(ArrayHeap.MINHEAP, new ArrayList<Integer>(Arrays.asList(elements)));
 		long end = System.currentTimeMillis();
-//		System.out.println("Heap : "+minHeap);
-		System.out.println("Heap size : "+minHeap.size());
-		System.out.println("Total time to add : "+((end-start)/1000d));
+		 System.out.println("Heap : "+minHeap);
+		System.out.println("Heap size : " + minHeap.size());
+		System.out.println("Total time to add : " + ((end - start) / 1000d));
 		start = System.currentTimeMillis();
-		while(!minHeap.isEmpty()){
-//			System.out.print(minHeap.remove()+" ");
-			minHeap.remove();
+		while (!minHeap.isEmpty()) {
+			 System.out.print(minHeap.remove()+" ");
+//			minHeap.remove();
 		}
 		end = System.currentTimeMillis();
-		System.out.println("\nTotal time to remove : "+((end-start)/1000d));
+		System.out.println("\nTotal time to remove : " + ((end - start) / 1000d));
 	}
 }
