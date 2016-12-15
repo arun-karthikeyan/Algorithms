@@ -80,7 +80,6 @@ public class AVLTreeBasic<E extends Comparable<E>> {
 		}else if(compare<0){
 			node.left = delete(node.left, val);
 		}else{
-			//need to fix this part -> has to proceed like bst delete and then fix things by rotating
 			this.size--;
 			if(node.count>1){
 				node.count--;
