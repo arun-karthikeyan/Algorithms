@@ -55,25 +55,24 @@ public class AVLTree<E extends Comparable<E>> {
 	}
 
 	private void triggerRotation(AVLNode temp) {
-		int rotationCount=0;
-		while(temp!=null){
+		while (temp != null) {
 			int leftTreeHeight = getHeight(temp.left);
 			int rightTreeHeight = getHeight(temp.right);
-			if(Math.abs(leftTreeHeight-rightTreeHeight)>1){
+			if (abs(leftTreeHeight - rightTreeHeight) > 1) {
 				temp = rotate(temp, leftTreeHeight, rightTreeHeight);
-				if(root.parent!=null){
+				if (root.parent != null) {
 					root = root.parent;
 				}
 				leftTreeHeight = getHeight(temp.left);
 				rightTreeHeight = getHeight(temp.right);
-				rotationCount++;
-				if(rotationCount>1){
-					System.out.println("rotation count exceeded");
-				}
 			}
 			temp.height = max(leftTreeHeight, rightTreeHeight) + 1;
 			temp = temp.parent;
 		}
+	}
+
+	private int abs(int a) {
+		return a < 0 ? -a : a;
 	}
 
 	public void add(E value) {
@@ -85,12 +84,12 @@ public class AVLTree<E extends Comparable<E>> {
 		long start = System.currentTimeMillis();
 		AVLNode temp = searchAndAdd(value);
 		long end = System.currentTimeMillis();
-		totalAdd+=(end-start);
+		totalAdd += (end - start);
 		if (temp != null) {
 			start = System.currentTimeMillis();
 			triggerRotation(temp);
 			end = System.currentTimeMillis();
-			totalRotate+=(end-start);
+			totalRotate += (end - start);
 		}
 	}
 
@@ -100,6 +99,108 @@ public class AVLTree<E extends Comparable<E>> {
 
 	private int max(int a, int b) {
 		return a > b ? a : b;
+	}
+
+	public E delete(E value) {
+		long start = System.currentTimeMillis();
+		AVLNode toDelete = search(value);
+		long end = System.currentTimeMillis();
+		totalRotate+=(end-start);
+		start = System.currentTimeMillis();
+		if (toDelete == null) {
+			totalAdd+=(System.currentTimeMillis()-start);
+			return null;
+		}
+		this.size--;
+		if (toDelete.count > 1) {
+			toDelete.count--;
+			totalAdd+=(System.currentTimeMillis()-start);
+			return toDelete.value;
+		}
+		// leaf case
+		if (toDelete.right == null && toDelete.left == null) {
+			if (toDelete == this.root) {
+				this.root = null;
+			} else {
+				AVLNode parent = toDelete.parent;
+				if (parent != null) {
+					if (parent.left == toDelete) {
+						parent.left = null;
+					} else {
+						parent.right = null;
+					}
+					triggerRotation(parent);
+				}
+			}
+			totalAdd+=(System.currentTimeMillis()-start);
+			return toDelete.value;
+		} else if (toDelete.right == null) {
+			// toDelete has left child but no right child
+			if (toDelete == this.root) {
+				this.root = toDelete.left;
+				this.root.parent = null;
+			} else {
+				AVLNode parent = toDelete.parent;
+				if (parent != null) {
+					if (parent.left == toDelete) {
+						parent.left = toDelete.left;
+					} else {
+						parent.right = toDelete.left;
+					}
+				}
+				toDelete.left.parent = parent;
+				triggerRotation(parent);
+			}
+			totalAdd+=(System.currentTimeMillis()-start);
+			return toDelete.value;
+		} else if (toDelete.left == null) {
+			// toDelete has right child but no left child
+			if (toDelete == this.root) {
+				this.root = toDelete.right;
+				this.root.parent = null;
+			} else {
+				AVLNode parent = toDelete.parent;
+				if (parent != null) {
+					if (parent.left == toDelete) {
+						parent.left = toDelete.right;
+					} else {
+						parent.right = toDelete.right;
+					}
+				}
+				toDelete.right.parent = parent;
+				triggerRotation(parent);
+			}
+			totalAdd+=(System.currentTimeMillis()-start);
+			return toDelete.value;
+		} else {
+			// both child case
+			AVLNode replacement = findMin(toDelete.right);
+			E valueToReturn = toDelete.value;
+			toDelete.value = replacement.value;
+			toDelete.count = replacement.count;
+			AVLNode parent = replacement.parent;
+			if (parent != null) {
+				if (parent.left == replacement) {
+					parent.left = replacement.right;
+				} else {
+					parent.right = replacement.right;
+				}
+				if(replacement.right!=null){
+					replacement.right.parent = parent;
+				}
+				triggerRotation(parent);
+			}
+			totalAdd+=(System.currentTimeMillis()-start);
+			return valueToReturn;
+		}
+		
+	}
+
+	private AVLNode findMin(AVLNode node) {
+		while (node.left != null) {
+			node = node.left;
+		}
+		return node;
 	}
 
 	private AVLNode rotate(AVLNode node, int leftTreeHeight, int rightTreeHeight) {
@@ -129,7 +230,7 @@ public class AVLTree<E extends Comparable<E>> {
 		AVLNode s1 = node.left;
 		s1.parent = p;
 		node.left = s1.right;
-		if(s1.right!=null){
+		if (s1.right != null) {
 			s1.right.parent = node;
 		}
 		node.parent = s1;
@@ -148,7 +249,7 @@ public class AVLTree<E extends Comparable<E>> {
 		AVLNode s1 = node.left;
 		AVLNode s2 = s1.right;
 		s1.right = s2.left;
-		if(s2.left!=null){
+		if (s2.left != null) {
 			s2.left.parent = s1;
 		}
 		node.left = s2;
@@ -164,7 +265,7 @@ public class AVLTree<E extends Comparable<E>> {
 		AVLNode s1 = node.right;
 		AVLNode s2 = s1.left;
 		s1.left = s2.right;
-		if(s2.right!=null){
+		if (s2.right != null) {
 			s2.right.parent = s1;
 		}
 		s2.parent = node;
@@ -175,9 +276,9 @@ public class AVLTree<E extends Comparable<E>> {
 		updateHeight(s2);
 		return rr(node);
 	}
-	
-	private void updateHeight(AVLNode node){
-		node.height =  max(getHeight(node.left), getHeight(node.right)) + 1;
+
+	private void updateHeight(AVLNode node) {
+		node.height = max(getHeight(node.left), getHeight(node.right)) + 1;
 	}
 
 	private AVLNode rr(AVLNode node) {
@@ -185,7 +286,7 @@ public class AVLTree<E extends Comparable<E>> {
 		AVLNode s2 = node.right;
 		s2.parent = p;
 		node.right = s2.left;
-		if(s2.left!=null){
+		if (s2.left != null) {
 			s2.left.parent = node;
 		}
 		node.parent = s2;
@@ -238,24 +339,42 @@ public class AVLTree<E extends Comparable<E>> {
 	public static void main(String[] args) {
 		System.out.println("Started...");
 		int MAX = Integer.MAX_VALUE;
-		int N = (int) 3e6;
+		int N = (int) 1e6;
 		AVLTree<Integer> avl;
-//		do{
+		// do{
 		totalAdd = 0l;
 		totalRotate = 0l;
+		int[] elements = new int[N];
+		for(int i=0; i<N; ++i){
+			elements[i] = (int)(Math.random()*MAX);
+//			elements[i] = i;
+		}
 		long start = System.currentTimeMillis();
 		avl = new AVLTree<Integer>();
 		for (int i = 0; i < N; ++i) {
-			avl.add((int) (Math.random() * MAX));
-			avl.add(i);
+			avl.add(elements[i]);
 		}
 		long end = System.currentTimeMillis();
 		if (DEBUG) {
-			System.out.println("Total searchAndAdd Time : "+((totalAdd)/1000d));
-			System.out.println("Total rotate Time : "+((totalRotate)/1000d));
+			System.out.println("Total searchAndAdd Time : " + ((totalAdd) / 1000d));
+			System.out.println("Total rotate Time : " + ((totalRotate) / 1000d));
 			System.out.println("The height of the tree with " + avl.size() + " nodes is " + avl.getHeight());
-			System.out.println("Total Time to Insert " + avl.size() + " values is " + ((end - start) / 1000d) + " seconds");
+			System.out.println(
+					"Total Time to Insert " + avl.size() + " values is " + ((end - start) / 1000d) + " seconds");
 		}
-//		}while(avl.getHeight()!=4);
+		totalAdd = 0l;
+		totalRotate = 0l;
+		start = System.currentTimeMillis();
+		for(int i=0; i<N; ++i){
+			avl.delete(elements[i]);
+		}
+		end = System.currentTimeMillis();
+		if(DEBUG){
+			System.out.println("Total Time to Delete "+N+" values is "+((end-start)/1000d)+" seconds");
+			System.out.println("Size after deletion : "+avl.size());
+			System.out.println("Total search Time : " + ((totalRotate) / 1000d));
+			System.out.println("Total delete and rotate Time : " + ((totalAdd) / 1000d));
+		}
+		// }while(avl.getHeight()!=4);
 	}
 }

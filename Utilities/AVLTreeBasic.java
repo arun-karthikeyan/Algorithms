@@ -10,7 +10,7 @@ public class AVLTreeBasic<E extends Comparable<E>> {
 			this.left = null;
 			this.right = null;
 			this.height = 0;
-			this.count = 0;
+			this.count = 1;
 		}
 	}
 	
@@ -47,7 +47,10 @@ public class AVLTreeBasic<E extends Comparable<E>> {
 		}else{
 			node.count++;
 		}
-		
+		return triggerRotation(node);
+	}
+	
+	private AVLNode triggerRotation(AVLNode node){
 		int leftTreeHeight = getHeight(node.left);
 		int rightTreeHeight = getHeight(node.right);
 		if(abs(leftTreeHeight-rightTreeHeight)>1){
@@ -55,6 +58,55 @@ public class AVLTreeBasic<E extends Comparable<E>> {
 		}
 		updateHeight(node);
 		return node;
+	}
+	
+	public E delete(E val){
+		int oldSize = this.size;
+		this.root = delete(this.root, val);
+		if(this.size<oldSize){
+			return val;
+		}else{
+			return null;
+		}
+	}
+	
+	private AVLNode delete(AVLNode node, E val){
+		if(node==null){
+			return node;
+		}
+		int compare = val.compareTo(node.value);
+		if(compare>0){
+			node.right = delete(node.right, val);
+		}else if(compare<0){
+			node.left = delete(node.left, val);
+		}else{
+			//need to fix this part -> has to proceed like bst delete and then fix things by rotating
+			this.size--;
+			if(node.count>1){
+				node.count--;
+				return node;
+			}
+			if(node.left==null && node.right==null){
+				return null;
+			}else if(node.left==null){
+				return node.right;
+			}else if(node.right==null){
+				return node.left;
+			}else{
+				node.right = replaceAndRemoveRightMin(node, node.right);
+			}
+		}
+		return triggerRotation(node);
+	}
+	
+	private AVLNode replaceAndRemoveRightMin(AVLNode node, AVLNode rightMin){
+		if(rightMin.left==null){
+			node.value = rightMin.value;
+			node.count = rightMin.count;
+			return rightMin.right;
+		}
+		rightMin.left = replaceAndRemoveRightMin(node, rightMin.left);
+		return triggerRotation(rightMin);
 	}
 	
 	public boolean contains(E val){
@@ -146,18 +198,32 @@ public class AVLTreeBasic<E extends Comparable<E>> {
 	public static void main(String[] args) throws Exception{
 		System.out.println("Started...");
 		int MAX = Integer.MAX_VALUE;
-		int N = (int) 2e6;
+		int N = (int) 10e6;
+		int[] elements = new int[N];
+		for(int i=0; i<N; ++i){
+			elements[i] = (int)(Math.random()*MAX);
+//			elements[i] = i;
+		}
 		AVLTreeBasic<Integer> avl;
 		long start = System.currentTimeMillis();
 		avl = new AVLTreeBasic<Integer>();
 		for (int i = 0; i < N; ++i) {
-//			avl.insert((int) (Math.random() * MAX));
-			avl.insert(i);
+			avl.insert(elements[i]);
 		}
 		long end = System.currentTimeMillis();
 		if (DEBUG) {
 			System.out.println("The height of the tree with " + avl.size() + " nodes is " + avl.getHeight());
 			System.out.println("Total Time to Insert " + avl.size() + " values is " + ((end - start) / 1000d) + " seconds");
+		}
+		start = System.currentTimeMillis();
+		for(int i=0; i<N; ++i){
+			avl.delete(elements[i]);
+		}
+		end = System.currentTimeMillis();
+		if(DEBUG){
+			System.out.println("Total Time to Delete "+N+" values is "+((end-start)/1000d)+" seconds");
+			System.out.println("Size after deletion : "+avl.size);
+			System.out.println("END");
 		}
 	}
 
