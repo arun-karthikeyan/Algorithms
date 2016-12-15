@@ -197,7 +197,7 @@ public class AVLTreeBasic<E extends Comparable<E>> {
 	public static void main(String[] args) throws Exception{
 		System.out.println("Started...");
 		int MAX = Integer.MAX_VALUE;
-		int N = (int) 10e6;
+		int N = (int) 50e6;
 		int[] elements = new int[N];
 		for(int i=0; i<N; ++i){
 			elements[i] = (int)(Math.random()*MAX);
