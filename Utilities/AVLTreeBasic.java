@@ -21,7 +21,7 @@ public class AVLTreeBasic<E extends Comparable<E>> {
 		Stack<AVLNode> sortedList;
 		public InOrderIterator(){
 			sortedList = new Stack<AVLNode>();
-			AVLNode temp = root;
+			AVLNode temp = AVLTreeBasic.this.root;
 			while(temp!=null){
 				sortedList.push(temp);
 				temp = temp.left;
@@ -195,6 +195,27 @@ public class AVLTreeBasic<E extends Comparable<E>> {
 		updateHeight(s1);
 		return s1;
 	}
+	public E findMax(){
+		if(isEmpty()){
+			return null;
+		}
+		AVLNode temp = root;
+		while(temp.right!=null){
+			temp = temp.right;
+		}
+		return temp.value;
+	}
+	
+	public E findMin(){
+		if(isEmpty()){
+			return null;
+		}
+		AVLNode temp = root;
+		while(temp.left!=null){
+			temp = temp.left;
+		}
+		return temp.value;
+	}
 	
 	private AVLNode lr(AVLNode node){
 		node.left = rr(node.left);
@@ -234,7 +255,7 @@ public class AVLTreeBasic<E extends Comparable<E>> {
 	public static void main(String[] args) throws Exception{
 		System.out.println("Started...");
 		int MAX = Integer.MAX_VALUE;
-		int N = (int) 50e6;
+		int N = (int) 1e6;
 		int[] elements = new int[N];
 		for(int i=0; i<N; ++i){
 			elements[i] = (int)(Math.random()*MAX);
