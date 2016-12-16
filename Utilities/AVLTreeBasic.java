@@ -103,6 +103,54 @@ public class AVLTreeBasic<E extends Comparable<E>> {
 		}
 	}
 	
+	public E removeMin() {
+		if (isEmpty()) {
+			return null;
+		}
+		this.size--;
+		AVLNode min = new AVLNode(null);
+		this.root = removeMin(this.root, min);
+		return min.value;
+	}
+
+	public E removeMax() {
+		if (isEmpty()) {
+			return null;
+		}
+		this.size--;
+		AVLNode max = new AVLNode(null);
+		this.root = removeMax(this.root, max);
+		return max.value;
+	}
+
+	private AVLNode removeMin(AVLNode node, AVLNode min) {
+		if (node.left == null) {
+			min.value = node.value;
+			if (node.count > 1) {
+				node.count--;
+				return node;
+			} else {
+				return node.right;
+			}
+		}
+		node.left = removeMin(node.left, min);
+		return triggerRotation(node);
+	}
+
+	private AVLNode removeMax(AVLNode node, AVLNode max) {
+		if (node.right == null) {
+			max.value = node.value;
+			if (node.count > 1) {
+				node.count--;
+				return node;
+			} else {
+				return node.left;
+			}
+		}
+		node.right = removeMax(node.right, max);
+		return triggerRotation(node);
+	}
+	
 	private AVLNode delete(AVLNode node, E val){
 		if(node==null){
 			return node;
