@@ -1,7 +1,43 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Stack;
 
-public class AVLTreeBasic<E extends Comparable<E>> {
+public class UVA10226 {
+public static void main(String[] args) throws Exception {
+	BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//			BufferedReader br = new BufferedReader(new FileReader("testip.txt"));
+	PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
+	int testcases = Integer.parseInt(br.readLine());
+	br.readLine();
+	while (testcases-- > 0) {
+		AVLTreeBasic<String> population = new AVLTreeBasic<String>();
+		String species;
+		while((species=br.readLine())!=null && species.length()>0){
+			population.insert(species);
+		}
+		int size = population.size();
+		Iterator<Object[]> iter = population.inOrderIterator();
+		while(iter.hasNext()){
+			Object[] nextObj = iter.next();
+			String nextSpecies = (String)nextObj[0];
+			Integer nextSpeciesCount = (Integer)nextObj[1];
+			
+			pw.printf("%s %.4f\n", nextSpecies, (nextSpeciesCount*100d)/size);
+		}
+		if(testcases!=0){
+			pw.println();
+		}
+	}
+
+	br.close();
+	pw.flush();
+	pw.close();
+}
+
+static class AVLTreeBasic<E extends Comparable<E>>{
 	class AVLNode{
 		E value;
 		AVLNode left;
@@ -228,39 +264,6 @@ public class AVLTreeBasic<E extends Comparable<E>> {
 	public Iterator<Object[]> inOrderIterator(){
 		return new InOrderIterator();
 	}
-	
-	private static boolean DEBUG = true;
-	
-	public static void main(String[] args) throws Exception{
-		System.out.println("Started...");
-		int MAX = Integer.MAX_VALUE;
-		int N = (int) 50e6;
-		int[] elements = new int[N];
-		for(int i=0; i<N; ++i){
-			elements[i] = (int)(Math.random()*MAX);
-//			elements[i] = i;
-		}
-		AVLTreeBasic<Integer> avl;
-		long start = System.currentTimeMillis();
-		avl = new AVLTreeBasic<Integer>();
-		for (int i = 0; i < N; ++i) {
-			avl.insert(elements[i]);
-		}
-		long end = System.currentTimeMillis();
-		if (DEBUG) {
-			System.out.println("The height of the tree with " + avl.size() + " nodes is " + avl.getHeight());
-			System.out.println("Total Time to Insert " + avl.size() + " values is " + ((end - start) / 1000d) + " seconds");
-		}
-		start = System.currentTimeMillis();
-		for(int i=0; i<N; ++i){
-			avl.delete(elements[i]);
-		}
-		end = System.currentTimeMillis();
-		if(DEBUG){
-			System.out.println("Total Time to Delete "+N+" values is "+((end-start)/1000d)+" seconds");
-			System.out.println("Size after deletion : "+avl.size);
-			System.out.println("END");
-		}
-	}
+}
 
 }
