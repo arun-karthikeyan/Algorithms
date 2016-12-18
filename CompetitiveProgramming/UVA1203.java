@@ -3,6 +3,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Stack;
 import java.util.StringTokenizer;
@@ -348,24 +349,24 @@ public class UVA1203 {
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
 		String str;
 		AVLTreeBasic<Query> topK = new AVLTreeBasic<Query>();
-		ArrayList<int[]> queries = new ArrayList<int[]>();
+		ArrayList<Query> queries = new ArrayList<Query>();
 		while (!"#".equals(str = br.readLine())) {
 			StringTokenizer st = new StringTokenizer(str);
 			st.nextToken();
 			int qNo = Integer.parseInt(st.nextToken()), interval = Integer.parseInt(st.nextToken());
-			queries.add(new int[] { qNo, interval });
+			queries.add(new Query(qNo, interval));
 		}
+		Collections.sort(queries);
 		int k = Integer.parseInt(br.readLine());
 		for (int i = 0, iLen = queries.size(); i < iLen; ++i) {
-			int[] query = queries.get(i);
-			int time = query[TIME];
-			Query nextQuery = new Query(query[QNO], time);
+			Query nextQuery = queries.get(i);
+			int interval = nextQuery.time;
 			while (topK.size < k || topK.findMax().compareTo(nextQuery) > 0) {
 				topK.insert(nextQuery);
 				if(topK.size()>k){
 					topK.removeMax();
 				}
-				nextQuery = new Query(query[QNO], nextQuery.time+query[TIME]);
+				nextQuery = new Query(nextQuery.qid, nextQuery.time+interval);
 			}
 		}
 		Iterator<Object[]> resultIterator = topK.inOrderIterator();
