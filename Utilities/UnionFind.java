@@ -9,6 +9,10 @@ public class UnionFind {
 	 */
 	int[] id;
 	/**
+	 * holds an upper-bound on the tree height of the component of each element
+	 */
+	int[] sz;
+	/**
 	 * keeps count of the number of connected components
 	 */
 	int count;
@@ -22,7 +26,10 @@ public class UnionFind {
 		this.id = new int[N];
 		for (int i = 0; i < N; ++i) {
 			this.id[i] = i;
+			this.sz[i] = 1;
 		}
+		this.count = N;
+		
 	}
 
 	/**
@@ -32,7 +39,20 @@ public class UnionFind {
 	 * @param q
 	 */
 	public void union(int p, int q) {
-
+		int i = find(p);
+		int j = find(q);
+		
+		if(i==j){
+			return;
+		}
+		if(sz[i]<sz[j]){
+			id[i] = j;
+			sz[j]+=sz[i];
+		}else{
+			id[j] = i;
+			sz[i]+=sz[j];
+		}
+		this.count--;
 	}
 
 	/**
@@ -42,7 +62,10 @@ public class UnionFind {
 	 * @return
 	 */
 	public int find(int p) {
-		return 0;
+		if(p==this.id[p]){
+			return p;
+		}
+		return this.id[p]=find(this.id[p]);
 	}
 
 	/**
@@ -53,7 +76,7 @@ public class UnionFind {
 	 * @return
 	 */
 	public boolean connected(int p, int q) {
-		return false;
+		return find(p)==find(q);
 	}
 
 	/**
@@ -62,6 +85,6 @@ public class UnionFind {
 	 * @return
 	 */
 	public int count() {
-		return 0;
+		return this.count;
 	}
 }
