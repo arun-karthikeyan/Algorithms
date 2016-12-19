@@ -78,6 +78,7 @@ public class AVLTreeBasic<E extends Comparable<E>> {
 				cursor = s1.pop();
 				if (!s2.isEmpty() && s2.peek() == cursor) {
 					toReturn = new Object[] { cursor.value, cursor.count };
+					s2.pop();
 					cursor = null;
 				} else if (cursor.right != null) {
 					s1.push(cursor);
@@ -383,7 +384,7 @@ public class AVLTreeBasic<E extends Comparable<E>> {
 	public Iterator<Object[]> preOrderIterator() {
 		return new PreOrderIterator();
 	}
-	
+
 	public Iterator<Object[]> postOrderIterator() {
 		return new PostOrderIterator();
 	}
@@ -401,10 +402,22 @@ public class AVLTreeBasic<E extends Comparable<E>> {
 		for (int i = 0; i < N; ++i) {
 			avl.insert(elements[i]);
 		}
-
+		System.out.println("Printing in-order");
+		Iterator<Object[]> inOrderIterator = avl.inOrderIterator();
+		while (inOrderIterator.hasNext()) {
+			System.out.print((int) inOrderIterator.next()[0] + " ");
+		}
+		System.out.println();
+		System.out.println("Printing pre-order");
 		Iterator<Object[]> preOrderIterator = avl.preOrderIterator();
 		while (preOrderIterator.hasNext()) {
 			System.out.print((int) preOrderIterator.next()[0] + " ");
+		}
+		System.out.println();
+		System.out.println("Printing post-order");
+		Iterator<Object[]> postOrderIterator = avl.postOrderIterator();
+		while (postOrderIterator.hasNext()) {
+			System.out.print((int) postOrderIterator.next()[0] + " ");
 		}
 		System.out.println();
 
