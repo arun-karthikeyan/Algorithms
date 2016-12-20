@@ -8,15 +8,17 @@ public class UnionFind {
 	 * holds the connected component id for the elements
 	 */
 	int[] id;
+	
 	/**
-	 * holds an upper-bound on the tree height of the component of each element
+	 * holds the size of the component of containing each element
 	 */
 	int[] sz;
+	
 	/**
 	 * keeps count of the number of connected components
 	 */
 	int count;
-
+	
 	/**
 	 * Initializes N sites with integer names 0 to N-1
 	 * 
@@ -80,11 +82,20 @@ public class UnionFind {
 	}
 
 	/**
-	 * number of components
+	 * number of (disjoint) components
 	 * 
 	 * @return
 	 */
 	public int count() {
 		return this.count;
+	}
+	
+	/**
+	 * returns the size of the component containing this element
+	 * @param p
+	 * @return
+	 */
+	public int componentSize(int p){
+		return this.sz[find(p)];
 	}
 }
