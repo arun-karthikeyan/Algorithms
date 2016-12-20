@@ -75,10 +75,12 @@ abstract class SegmentTreeADT<B, S, L extends Lazy> {
 
 		if (this.lazyTree[node].isPendingUpdate()) {
 			// take care of the update first
-			lazyUpdateSegTree(node);
+			finishPendingUpdate(node);
 			if (start != end) { // non-leaf case
 				// mark left and right child as lazy
-				markChildrenLazy(node);
+				moveLazyUpdateToChildren(node);
+				this.lazyTree[node << 1].setPendingUpdate(true);
+				this.lazyTree[(node << 1) + 1].setPendingUpdate(true);
 			}
 			// mark node as updated
 			this.lazyTree[node].setPendingUpdate(false);
@@ -101,26 +103,58 @@ abstract class SegmentTreeADT<B, S, L extends Lazy> {
 		return merge(p1, p2);
 	}
 
+	/**
+	 * Range lazy-update segment tree
+	 * 
+	 * @param node
+	 *            node to be updated
+	 * @param start
+	 *            start index of the node
+	 * @param end
+	 *            end index of the node
+	 * @param l
+	 *            start index of the query
+	 * @param r
+	 *            end index of the query
+	 * @param val
+	 *            update value
+	 */
+
 	public void updateRange(int node, int start, int end, int l, int r, B val) {
 		if (this.lazyTree[node].isPendingUpdate()) {
 			// update node first
-			lazyUpdateSegTree(node);
-			if(start!=end){//non-leaf case
-				//mark left and right child as lazy
-				markChildrenLazy(node);
+			finishPendingUpdate(node);
+			if (start != end) {// non-leaf case
+				// mark left and right child as lazy
+				moveLazyUpdateToChildren(node);
+				this.lazyTree[node << 1].setPendingUpdate(true);
+				this.lazyTree[(node << 1) + 1].setPendingUpdate(true);
 			}
-			//mark node as updated
+			// mark node as updated
 			this.lazyTree[node].setPendingUpdate(false);
 		}
-		
-		if(start>r || end<l){
-			return; //completely out of bounds case
+
+		if (start > r || end < l) {
+			return; // completely out of bounds case
 		}
-		
-		if(l>=start && r<=end){
-			//completely in bounds case
+
+		if (l >= start && r <= end) {
+			// completely in bounds case
 			updateRangeWithVal(node, start, end, l, r, val);
+			if (start != end) {// non-leaf case
+				// lazily push update of children to a later time
+				moveUpdateToChildren(node, start, end, l, r, val);
+				this.lazyTree[node << 1].setPendingUpdate(true);
+				this.lazyTree[(node << 1) + 1].setPendingUpdate(true);
+
+			}
+			return;
 		}
+
+		int mid = (start + end) >> 1, left = node << 1, right = left + 1;
+		updateRange(left, start, mid, l, r, val);
+		updateRange(right, mid + 1, end, l, r, val);
+		this.segmentTree[node] = merge(this.segmentTree[left], this.segmentTree[right]);
 	}
 
 	/**
@@ -178,28 +212,55 @@ abstract class SegmentTreeADT<B, S, L extends Lazy> {
 	 * 
 	 * @param idx
 	 */
-	abstract void lazyUpdateSegTree(int idx);
+	abstract void finishPendingUpdate(int idx);
 
 	/**
 	 * mark the children of this parent node as lazy and pass on any query
 	 * parameters to the children as required
 	 * 
-	 * @param parent
+	 * @param node
 	 *            the parent from which the lazy update has to be pushed to the
 	 *            children
 	 */
-	abstract void markChildrenLazy(int parent);
-	
+	abstract void moveLazyUpdateToChildren(int node);
+
 	/**
 	 * updates the current range with val
-	 * @param node segmentTreeIndex, lazyTreeIndex
-	 * @param start start index of this range
-	 * @param end end index of this range
-	 * @param l start index of this query
-	 * @param r end index of this query
-	 * @param val value to update the SegmentTree with
+	 * 
+	 * @param node
+	 *            segmentTreeIndex, lazyTreeIndex
+	 * @param start
+	 *            start index of this range
+	 * @param end
+	 *            end index of this range
+	 * @param l
+	 *            start index of this query
+	 * @param r
+	 *            end index of this query
+	 * @param val
+	 *            value to update the SegmentTree with
 	 */
 	abstract void updateRangeWithVal(int node, int start, int end, int l, int r, B val);
+
+	/**
+	 * moves the query update to children so that the children can be updated
+	 * lazily at a later time
+	 * 
+	 * @param node
+	 *            the parent (segmentTree index & lazyTree index) whose children
+	 *            have to be marked for lazy update
+	 * @param start
+	 *            start index of this range
+	 * @param end
+	 *            end index of this range
+	 * @param l
+	 *            start index of this query
+	 * @param r
+	 *            end index of this query
+	 * @param val
+	 *            value to mark the children for lazy update with
+	 */
+	abstract void moveUpdateToChildren(int node, int start, int end, int l, int r, B val);
 }
 
 abstract class Lazy {
