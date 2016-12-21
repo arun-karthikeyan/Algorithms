@@ -51,7 +51,7 @@ abstract class SegmentTreeADT<B, S, L extends Lazy> {
 		build(right, mid + 1, end);
 		initSegNode(node);
 		initLazyNode(node);
-		this.segmentTree[node] = merge(this.segmentTree[left], this.segmentTree[right]);
+		mergeSegmentTreeNode(node, left, right);
 	}
 
 	/**
@@ -100,7 +100,7 @@ abstract class SegmentTreeADT<B, S, L extends Lazy> {
 		if (p2 == null) {
 			return p1;
 		}
-		return merge(p1, p2);
+		return mergeValue(p1, p2);
 	}
 
 	/**
@@ -120,7 +120,7 @@ abstract class SegmentTreeADT<B, S, L extends Lazy> {
 	 *            update value
 	 */
 
-	public void updateRange(int node, int start, int end, int l, int r, B val) {
+	public void updateRange(int node, int qType, int start, int end, int l, int r, B val) {
 		if (this.lazyTree[node].isPendingUpdate()) {
 			// update node first
 			finishPendingUpdate(node);
@@ -138,12 +138,12 @@ abstract class SegmentTreeADT<B, S, L extends Lazy> {
 			return; // completely out of bounds case
 		}
 
-		if (l >= start && r <= end) {
+		if (start >= l && end <= r) {
 			// completely in bounds case
-			updateRangeWithVal(node, start, end, l, r, val);
+			updateRangeWithVal(node, qType, start, end, l, r, val);
 			if (start != end) {// non-leaf case
 				// lazily push update of children to a later time
-				moveUpdateToChildren(node, start, end, l, r, val);
+				moveUpdateToChildren(node, qType, start, end, l, r, val);
 				this.lazyTree[node << 1].setPendingUpdate(true);
 				this.lazyTree[(node << 1) + 1].setPendingUpdate(true);
 
@@ -152,9 +152,9 @@ abstract class SegmentTreeADT<B, S, L extends Lazy> {
 		}
 
 		int mid = (start + end) >> 1, left = node << 1, right = left + 1;
-		updateRange(left, start, mid, l, r, val);
-		updateRange(right, mid + 1, end, l, r, val);
-		this.segmentTree[node] = merge(this.segmentTree[left], this.segmentTree[right]);
+		updateRange(left, qType, start, mid, l, r, val);
+		updateRange(right, qType, mid + 1, end, l, r, val);
+		mergeSegmentTreeNode(node,left,right);
 	}
 
 	/**
@@ -175,8 +175,15 @@ abstract class SegmentTreeADT<B, S, L extends Lazy> {
 	 * @param p2
 	 * @return
 	 */
-	abstract S merge(S p1, S p2);
-
+	abstract S mergeValue(S p1, S p2);
+	
+	/**
+	 * merges the value of the segmentTreeNode at index left and right and saves the result in node
+	 * @param node destination of merge
+	 * @param left left child
+	 * @param right right child
+	 */
+	abstract void mergeSegmentTreeNode(int node, int left, int right);
 	/**
 	 * defines the segmentTree array
 	 * 
@@ -229,6 +236,8 @@ abstract class SegmentTreeADT<B, S, L extends Lazy> {
 	 * 
 	 * @param node
 	 *            segmentTreeIndex, lazyTreeIndex
+	 * @param qType
+	 *            query type
 	 * @param start
 	 *            start index of this range
 	 * @param end
@@ -240,7 +249,7 @@ abstract class SegmentTreeADT<B, S, L extends Lazy> {
 	 * @param val
 	 *            value to update the SegmentTree with
 	 */
-	abstract void updateRangeWithVal(int node, int start, int end, int l, int r, B val);
+	abstract void updateRangeWithVal(int node, int qType, int start, int end, int l, int r, B val);
 
 	/**
 	 * moves the query update to children so that the children can be updated
@@ -249,6 +258,8 @@ abstract class SegmentTreeADT<B, S, L extends Lazy> {
 	 * @param node
 	 *            the parent (segmentTree index & lazyTree index) whose children
 	 *            have to be marked for lazy update
+	 * @param qType
+	 *            query type
 	 * @param start
 	 *            start index of this range
 	 * @param end
@@ -260,7 +271,7 @@ abstract class SegmentTreeADT<B, S, L extends Lazy> {
 	 * @param val
 	 *            value to mark the children for lazy update with
 	 */
-	abstract void moveUpdateToChildren(int node, int start, int end, int l, int r, B val);
+	abstract void moveUpdateToChildren(int node, int qtype, int start, int end, int l, int r, B val);
 }
 
 abstract class Lazy {
