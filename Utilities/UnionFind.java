@@ -1,5 +1,6 @@
 /**
  * API for Weighted Quick Union with Path Compression
+ * 
  * @author arun
  *
  */
@@ -8,17 +9,17 @@ public class UnionFind {
 	 * holds the connected component id for the elements
 	 */
 	int[] id;
-	
+
 	/**
 	 * holds the size of the component of containing each element
 	 */
 	int[] sz;
-	
+
 	/**
 	 * keeps count of the number of connected components
 	 */
 	int count;
-	
+
 	/**
 	 * Initializes N sites with integer names 0 to N-1
 	 * 
@@ -26,12 +27,13 @@ public class UnionFind {
 	 */
 	public UnionFind(int N) {
 		this.id = new int[N];
+		this.sz = new int[N];
 		for (int i = 0; i < N; ++i) {
 			this.id[i] = i;
 			this.sz[i] = 1;
 		}
 		this.count = N;
-		
+
 	}
 
 	/**
@@ -43,16 +45,16 @@ public class UnionFind {
 	public void union(int p, int q) {
 		int i = find(p);
 		int j = find(q);
-		
-		if(i==j){
+
+		if (i == j) {
 			return;
 		}
-		if(sz[i]<sz[j]){
+		if (sz[i] < sz[j]) {
 			id[i] = j;
-			sz[j]+=sz[i];
-		}else{
+			sz[j] += sz[i];
+		} else {
 			id[j] = i;
-			sz[i]+=sz[j];
+			sz[i] += sz[j];
 		}
 		this.count--;
 	}
@@ -64,10 +66,10 @@ public class UnionFind {
 	 * @return
 	 */
 	public int find(int p) {
-		if(p==this.id[p]){
+		if (p == this.id[p]) {
 			return p;
 		}
-		return this.id[p]=find(this.id[p]);
+		return this.id[p] = find(this.id[p]);
 	}
 
 	/**
@@ -78,7 +80,7 @@ public class UnionFind {
 	 * @return
 	 */
 	public boolean connected(int p, int q) {
-		return find(p)==find(q);
+		return find(p) == find(q);
 	}
 
 	/**
@@ -89,13 +91,14 @@ public class UnionFind {
 	public int count() {
 		return this.count;
 	}
-	
+
 	/**
 	 * returns the size of the component containing this element
+	 * 
 	 * @param p
 	 * @return
 	 */
-	public int componentSize(int p){
+	public int componentSize(int p) {
 		return this.sz[find(p)];
 	}
 }
