@@ -258,14 +258,16 @@ public class UVA10158 {
 				}
 				break;
 			case AREFRIENDS:
-				if (xRoot == yRoot || (xEnemyRoot != -1 && (xEnemyRoot == yEnemyRoot))) {
+				//checking one case is enough because of commutative property
+				if (xRoot == yRoot) {
 					pw.println("1");
 				} else {
 					pw.println("0");
 				}
 				break;
 			case AREENEMIES:
-				if (xRoot == yEnemyRoot || yRoot == xEnemyRoot) {
+				//checking one case is enough because of commutative property
+				if (xRoot == yEnemyRoot) {
 					pw.println("1");
 				} else {
 					pw.println("0");
