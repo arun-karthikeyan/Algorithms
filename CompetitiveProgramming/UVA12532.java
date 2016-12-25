@@ -2,7 +2,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-
+/**
+ * Interval Product
+ * @author arun
+ *
+ */
 public class UVA12532 {
 	private static int[] baseArray;
 	private static STNode[] st;
@@ -100,6 +104,7 @@ public static void main(String[] args) throws Exception {
 			baseArray[i] = Integer.parseInt(nVal[i]);
 		}
 		buildST(1, 0, n-1);
+		StringBuilder result = new StringBuilder();
 		for(int i=0; i<m; ++i){
 			String[] q = br.readLine().split(" ");
 			if(q[0].charAt(0)=='C'){
@@ -108,10 +113,10 @@ public static void main(String[] args) throws Exception {
 				pointUpdate(1, 0, n-1, idx, val);
 			}else{
 				int l = Integer.parseInt(q[1])-1, r = Integer.parseInt(q[2])-1;
-				pw.print(getResult(rangeQuery(1, 0, n-1, l, r)));
+				result.append(getResult(rangeQuery(1, 0, n-1, l, r)));
 			}
 		}
-		pw.println();
+		pw.println(result.toString());
 	}
 
 	br.close();

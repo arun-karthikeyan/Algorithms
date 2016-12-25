@@ -4,7 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-
+/**
+ * Frequent Values
+ * @author arun
+ *
+ */
 public class UVA11235 {
 	private static int totalchars = 0, offset = 0;
 	private static InputStream stream;
