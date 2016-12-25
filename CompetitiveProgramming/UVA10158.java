@@ -5,7 +5,11 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Arrays;
-
+/**
+ * War - Ennai vechu senja problem
+ * @author arun
+ *
+ */
 public class UVA10158 {
 	/**
 	 * API for Weighted Quick Union with Path Compression
@@ -166,49 +170,13 @@ public class UVA10158 {
 		return sign * val;
 	}
 
-	private static long readLong() {
-		int number = readByte();
-
-		while (eolchar(number))
-			number = readByte();
-
-		int sign = 1;
-		long val = 0;
-
-		if (number == '-') {
-			sign = -1;
-			number = readByte();
-		}
-
-		do {
-			if ((number < '0') || (number > '9')) {
-				// return sign*val;
-				return 0;
-			}
-			val *= 10;
-			val += (number - '0');
-			number = readByte();
-		} while (!eolchar(number));
-
-		return sign * val;
-	}
-
 	private static boolean eolchar(int c) {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
 	}
 
 	private static final int SETFRIENDS = 1, SETENEMIES = 2, AREFRIENDS = 3, AREENEMIES = 4;
-	private static final int MAX = (int) 1e4;
 	private static UnionFind friend;
 	private static int[] enemy;
-
-	private static boolean areFriends(int x, int y) {
-		return friend.connected(x, y) || friend.connected(enemy[friend.find(x)], enemy[friend.find(y)]);
-	}
-
-	private static boolean areEnemies(int x, int y) {
-		return friend.connected(x, enemy[friend.find(y)]) || friend.connected(enemy[friend.find(x)], y);
-	}
 
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0 && "fileip".equals(args[0])) {
@@ -229,47 +197,81 @@ public class UVA10158 {
 			if (c == 0 && x == 0 && y == 0) {
 				break;
 			}
+			int xRoot = friend.find(x), yRoot = friend.find(y), yEnemyRoot = friend.find(enemy[yRoot]),
+					xEnemyRoot = friend.find(enemy[xRoot]);
 			switch (c) {
 			case SETFRIENDS:
-				if (!areEnemies(x, y)) {
-					friend.union(x, y);
-					friend.union(enemy[friend.find(x)], enemy[friend.find(y)]);
-				} else {
+				if (yRoot == xEnemyRoot || xRoot == yEnemyRoot) {
 					pw.println("-1");
+				} else {
+					if (xEnemyRoot == -1 && yEnemyRoot == -1) {
+						friend.union(xRoot, yRoot);
+					} else if (yEnemyRoot == -1) {
+						friend.union(xRoot, yRoot);
+						int newXUnion = friend.find(xRoot);
+						enemy[xEnemyRoot] = newXUnion;
+						enemy[newXUnion] = xEnemyRoot;
+					} else if (xEnemyRoot == -1) {
+						friend.union(yRoot, xRoot);
+						int newYUnion = friend.find(yRoot);
+						enemy[yEnemyRoot] = newYUnion;
+						enemy[newYUnion] = yEnemyRoot;
+					} else {
+						friend.union(xRoot, yRoot);
+						int newXYUnion = friend.find(xRoot);
+						friend.union(xEnemyRoot, yEnemyRoot);
+						int newEnemyUnion = friend.find(xEnemyRoot);
+						enemy[newXYUnion] = newEnemyUnion;
+						enemy[newEnemyUnion] = newXYUnion;
+					}
 				}
 				break;
 			case SETENEMIES:
-				if (!areFriends(x, y)) {
-					if (enemy[friend.find(x)] == -1) {
-						enemy[friend.find(x)] = friend.find(y);
+				if (xRoot != yRoot) {
+					if (xEnemyRoot == -1 && yEnemyRoot == -1) {
+						enemy[xRoot] = yRoot;
+						enemy[yRoot] = xRoot;
+					} else if (yEnemyRoot == -1) {
+						if (xEnemyRoot != yRoot) {
+							friend.union(xEnemyRoot, yRoot);
+							int newXEnemy = friend.find(yRoot);
+							enemy[xRoot] = newXEnemy;
+							enemy[newXEnemy] = xRoot;
+						}
+					} else if (xEnemyRoot == -1) {
+						if (yEnemyRoot != xRoot) {
+							friend.union(yEnemyRoot, xRoot);
+							int newYEnemy = friend.find(xRoot);
+							enemy[yRoot] = newYEnemy;
+							enemy[newYEnemy] = yRoot;
+						}
 					} else {
-						friend.union(enemy[friend.find(x)], y);
-					}
-					if (enemy[friend.find(y)] == -1) {
-						enemy[friend.find(y)] = friend.find(y);
-					} else {
-						friend.union(enemy[friend.find(y)], x);
+						friend.union(xEnemyRoot, yRoot);
+						int newXEnemy = friend.find(yRoot);
+						friend.union(yEnemyRoot, xRoot);
+						int newYEnemy = friend.find(xRoot);
+						enemy[newXEnemy] = newYEnemy;
+						enemy[newYEnemy] = newXEnemy;
 					}
 				} else {
 					pw.println("-1");
 				}
 				break;
 			case AREFRIENDS:
-				if (areFriends(x, y)) {
+				if (xRoot == yRoot || (xEnemyRoot != -1 && (xEnemyRoot == yEnemyRoot))) {
 					pw.println("1");
 				} else {
 					pw.println("0");
 				}
 				break;
 			case AREENEMIES:
-				if (areEnemies(x, y)) {
+				if (xRoot == yEnemyRoot || yRoot == xEnemyRoot) {
 					pw.println("1");
 				} else {
 					pw.println("0");
 				}
 			}
 		}
-
 		pw.flush();
 		pw.close();
 	}
