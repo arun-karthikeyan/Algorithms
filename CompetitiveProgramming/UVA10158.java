@@ -5,8 +5,10 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Arrays;
+
 /**
  * War - Ennai vechu senja problem
+ * 
  * @author arun
  *
  */
@@ -174,7 +176,9 @@ public class UVA10158 {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
 	}
 
+	private static final int NOENEMY = -1, NOTPOSSIBLE = -1;
 	private static final int SETFRIENDS = 1, SETENEMIES = 2, AREFRIENDS = 3, AREENEMIES = 4;
+	private static final int YES = 1, NO = 0;
 	private static UnionFind friend;
 	private static int[] enemy;
 
@@ -190,7 +194,7 @@ public class UVA10158 {
 		int n = readInt();
 		friend = new UnionFind(n);
 		enemy = new int[n];
-		Arrays.fill(enemy, -1);
+		Arrays.fill(enemy, NOENEMY);
 
 		while (true) {
 			int c = readInt(), x = readInt(), y = readInt();
@@ -201,17 +205,15 @@ public class UVA10158 {
 					xEnemyRoot = friend.find(enemy[xRoot]);
 			switch (c) {
 			case SETFRIENDS:
-				if (yRoot == xEnemyRoot || xRoot == yEnemyRoot) {
-					pw.println("-1");
-				} else {
-					if (xEnemyRoot == -1 && yEnemyRoot == -1) {
+				if (yRoot != xEnemyRoot) {
+					if (xEnemyRoot == NOENEMY && yEnemyRoot == NOENEMY) {
 						friend.union(xRoot, yRoot);
-					} else if (yEnemyRoot == -1) {
+					} else if (yEnemyRoot == NOENEMY) {
 						friend.union(xRoot, yRoot);
 						int newXUnion = friend.find(xRoot);
 						enemy[xEnemyRoot] = newXUnion;
 						enemy[newXUnion] = xEnemyRoot;
-					} else if (xEnemyRoot == -1) {
+					} else if (xEnemyRoot == NOENEMY) {
 						friend.union(yRoot, xRoot);
 						int newYUnion = friend.find(yRoot);
 						enemy[yEnemyRoot] = newYUnion;
@@ -224,21 +226,23 @@ public class UVA10158 {
 						enemy[newXYUnion] = newEnemyUnion;
 						enemy[newEnemyUnion] = newXYUnion;
 					}
+				} else {
+					pw.println(NOTPOSSIBLE);
 				}
 				break;
 			case SETENEMIES:
 				if (xRoot != yRoot) {
-					if (xEnemyRoot == -1 && yEnemyRoot == -1) {
+					if (xEnemyRoot == NOENEMY && yEnemyRoot == NOENEMY) {
 						enemy[xRoot] = yRoot;
 						enemy[yRoot] = xRoot;
-					} else if (yEnemyRoot == -1) {
+					} else if (yEnemyRoot == NOENEMY) {
 						if (xEnemyRoot != yRoot) {
 							friend.union(xEnemyRoot, yRoot);
 							int newXEnemy = friend.find(yRoot);
 							enemy[xRoot] = newXEnemy;
 							enemy[newXEnemy] = xRoot;
 						}
-					} else if (xEnemyRoot == -1) {
+					} else if (xEnemyRoot == NOENEMY) {
 						if (yEnemyRoot != xRoot) {
 							friend.union(yEnemyRoot, xRoot);
 							int newYEnemy = friend.find(xRoot);
@@ -254,23 +258,23 @@ public class UVA10158 {
 						enemy[newYEnemy] = newXEnemy;
 					}
 				} else {
-					pw.println("-1");
+					pw.println(NOTPOSSIBLE);
 				}
 				break;
 			case AREFRIENDS:
-				//checking one case is enough because of commutative property
+				// checking one case is enough because of commutative property
 				if (xRoot == yRoot) {
-					pw.println("1");
+					pw.println(YES);
 				} else {
-					pw.println("0");
+					pw.println(NO);
 				}
 				break;
 			case AREENEMIES:
-				//checking one case is enough because of commutative property
+				// checking one case is enough because of commutative property
 				if (xRoot == yEnemyRoot) {
-					pw.println("1");
+					pw.println(YES);
 				} else {
-					pw.println("0");
+					pw.println(NO);
 				}
 			}
 		}
