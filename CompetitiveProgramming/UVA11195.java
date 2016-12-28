@@ -3,45 +3,45 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
+/**
+ * Another n-Queens Problem
+ * 
+ * @author arun
+ *
+ */
 public class UVA11195 {
-	private static int countQueenSol(int[] queens, int currentPos, boolean[][] badSquares, boolean[] ld, boolean[] rd,
-			boolean[] r) {
-		if (currentPos == queens.length) {
+
+	private static int[] badSquares;
+	private static int finish;
+
+	private static int findSolutions(int rw, int d1, int d2, int col) {
+		if (rw == finish) {
 			return 1;
 		}
-
-		int sols = 0;
-		for (int i = 0, iLen = queens.length; i < iLen; ++i) {
-			int rowIdx = i, ldIdx = i + currentPos, rdIdx = i - currentPos + iLen - 1;
-			if (!badSquares[i][currentPos] && !r[rowIdx] && !ld[ldIdx] && !rd[rdIdx]) {
-				queens[currentPos] = i;
-				r[rowIdx] = true;
-				ld[ldIdx] = true;
-				rd[rdIdx] = true;
-				sols += countQueenSol(queens, currentPos + 1, badSquares, ld, rd, r);
-				r[rowIdx] = false;
-				ld[ldIdx] = false;
-				rd[rdIdx] = false;
-			}
+		int valid = finish & (~(rw | d1 | d2 | badSquares[col])), sum = 0;
+		while (valid > 0) {
+			int b = (valid & (-valid));
+			valid -= b;
+			sum += findSolutions((rw | b), (d1 | b) << 1, (d2 | b) >> 1, col + 1);
 		}
-		return sols;
+		return sum;
 	}
 
 	public static void main(String[] args) throws Exception {
-		 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-//		BufferedReader br = new BufferedReader(new FileReader("testip.txt"));
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		// BufferedReader br = new BufferedReader(new FileReader("testip.txt"));
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
 		int n, tc = 1;
 		while ((n = Integer.parseInt(br.readLine())) != 0) {
-			boolean[][] badSquares = new boolean[n][n];
+			badSquares = new int[n + 1];
+			finish = (1 << n) - 1;
 			for (int i = 0; i < n; ++i) {
 				String row = br.readLine();
 				for (int j = 0; j < n; ++j) {
-					badSquares[i][j] = row.charAt(j) == '*';
+					badSquares[j] |= row.charAt(j) == '*' ? 1 << i : 0;
 				}
 			}
-			pw.println("Case " + (tc++) + ": " + countQueenSol(new int[n], 0, badSquares, new boolean[2 * n - 1],
-					new boolean[2 * n - 1], new boolean[n]));
+			pw.println("Case " + (tc++) + ": " + findSolutions(0, 0, 0, 0));
 		}
 
 		br.close();
