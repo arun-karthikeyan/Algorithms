@@ -1,89 +1,92 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 public class HelperMethod {
-	static class Fenwick {
-		public int[] table;
+	private static int totalchars = 0, offset = 0;
+	private static InputStream stream;
+	private static byte[] buffer = new byte[65536];
 
-		public Fenwick(int maxN) {
-			this.table = new int[maxN + 1];
-		}
-
-		public void set(int index, int value) {
-			int diff = value - getValue(index);
-			adjust(index, diff);
-		}
-
-		public int sumQuery(int a, int b) {
-			return sumQuery(b) - sumQuery(a - 1);
-		}
-
-		public int sumQuery(int k) {
-			int ret = 0;
-			while (k > 0) {
-				ret += table[k];
-				k &= k - 1;
+	private static int readByte() {
+		if (totalchars < 0)
+			return 0;
+		if (offset >= totalchars) {
+			offset = 0;
+			try {
+				totalchars = stream.read(buffer);
+			} catch (IOException e) {
+				return 0;
 			}
-			return ret;
+			if (totalchars <= 0)
+				return -1;
 		}
-
-		public void adjust(int i, int adj) {
-			while (i < table.length) {
-				table[i] += adj;
-				i += (i & (-i));
-			}
-		}
-
-		public int getValue(int i) {
-			return sumQuery(i, i);
-		}
+		return buffer[offset++];
 	}
 
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader("testip.txt"));
-		PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File("testop.txt"))));
-		StringBuilder answers = new StringBuilder("");
-		String line;
-		int case_count = 1;
+	private static int readInt() {
+		int number = readByte();
 
-		while ((line = br.readLine()) != null) {
-			String[] tokens = line.split(" ");
-			int number_of_potentiometers = Integer.parseInt(tokens[0]);
+		while (eolchar(number))
+			number = readByte();
 
-			if (number_of_potentiometers == 0)
-				break;
+		int sign = 1;
+		int val = 0;
 
-			answers.append("Case " + (case_count++) + ":\n");
-			Fenwick ft = new Fenwick(number_of_potentiometers);
-
-			for (int i = 1; i <= number_of_potentiometers; i++)
-				ft.set(i, Integer.parseInt(br.readLine()));
-
-			while (!(line = br.readLine()).equals("END")) {
-				String[] row = line.split(" ");
-				String action = row[0];
-
-				if (action.equals("M")) {
-					int left_potentiometer = Integer.parseInt(row[1]);
-					int right_potentiometer = Integer.parseInt(row[2]);
-					int total = ft.sumQuery(left_potentiometer, right_potentiometer);
-					answers.append(total + "\n");
-				} else {
-					int index = Integer.parseInt(row[1]);
-					int value = Integer.parseInt(row[2]);
-					ft.set(index, value);
-				}
-			}
-			answers.append("\n");
+		if (number == '-') {
+			sign = -1;
+			number = readByte();
 		}
-		pw.print(answers.substring(0, answers.length() - 1));
+
+		do {
+			if ((number < '0') || (number > '9'))
+				return 0;
+			val *= 10;
+			val += (number - '0');
+			number = readByte();
+		} while (!eolchar(number));
+
+		return sign * val;
+	}
+
+	private static boolean eolchar(int c) {
+		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
+	}
+
+	private static int max(int a, int b) {
+		return a > b ? a : b;
+	}
+
+	private static int[][] DP;
+	private static int[] treats;
+	private static int n;
+
+	public static void main(String[] args) throws Exception {
+		stream = System.in;
+		PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
+
+		n = readInt();
+
+		treats = new int[n];
+
+		DP = new int[n][n];
+
+		for (int i = 0, j = n - 1; i < n; ++i, --j) {
+			treats[i] = readInt();
+			DP[i][j] = n * treats[i];
+		}
+
+		for (int k = 2; k <= n; ++k) {
+			for (int i = n - k, j = 0; i >= 0; --i, ++j) {
+				
+				DP[i][j] = max((DP[i + 1][j] + (i + j + 1) * treats[i]),
+						(DP[i][j + 1] + (i + j + 1) * treats[n - j - 1]));
+			}
+		}
+
+		pw.println(DP[0][0]);
 		pw.flush();
 		pw.close();
-		br.close();
 	}
 }

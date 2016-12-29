@@ -1,5 +1,5 @@
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.FileReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
@@ -28,8 +28,8 @@ public class UVA11195 {
 	}
 
 	public static void main(String[] args) throws Exception {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		// BufferedReader br = new BufferedReader(new FileReader("testip.txt"));
+//		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		 BufferedReader br = new BufferedReader(new FileReader("testip.txt"));
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
 		int n, tc = 1;
 		while ((n = Integer.parseInt(br.readLine())) != 0) {
@@ -41,7 +41,10 @@ public class UVA11195 {
 					badSquares[j] |= row.charAt(j) == '*' ? 1 << i : 0;
 				}
 			}
+			long start = System.currentTimeMillis();
 			pw.println("Case " + (tc++) + ": " + findSolutions(0, 0, 0, 0));
+			long end = System.currentTimeMillis();
+			pw.println("Time Taken : "+(end-start));
 		}
 
 		br.close();
