@@ -4,12 +4,12 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 /**
- * Cube Painting - Weak Test cases - Incorrect Solution Passes
+ * Dice
  * 
  * @author arun
  *
  */
-public class UVA253 {
+public class UVA11959 {
 	private static String createString(String src, int i, int j, int k, int l, int m, int n) {
 		StringBuilder sb = new StringBuilder();
 		return sb.append(src.charAt(i)).append(src.charAt(j)).append(src.charAt(k)).append(src.charAt(l))
@@ -52,24 +52,17 @@ public class UVA253 {
 		return result;
 	}
 
-	private static String correctInitString(String s) {
-		return createString(s, 0, 5, 1, 2, 4, 3);
-	}
-
-	private static final String TRUE = "TRUE", FALSE = "FALSE";
-
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		// BufferedReader br = new BufferedReader(new FileReader("testip.txt"));
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
-		String cube;
-		while ((cube = br.readLine()) != null) {
-			String d1 = correctInitString(cube.substring(0, 6));
-			String d2 = correctInitString(cube.substring(6));
-			if (isEqual(d1, d2)) {
-				pw.println(TRUE);
+		int testcases = Integer.parseInt(br.readLine());
+		while (testcases-- > 0) {
+			String[] info = br.readLine().trim().split(" ");
+			if (isEqual(info[0].trim(), info[1].trim())) {
+				pw.println("Equal");
 			} else {
-				pw.println(FALSE);
+				pw.println("Not Equal");
 			}
 		}
 
@@ -77,5 +70,4 @@ public class UVA253 {
 		pw.flush();
 		pw.close();
 	}
-
 }
