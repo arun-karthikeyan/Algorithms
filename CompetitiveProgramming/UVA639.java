@@ -1,5 +1,7 @@
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -60,9 +62,10 @@ public class UVA639 {
 	}
 
 	public static void main(String[] args) throws Exception {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		// BufferedReader br = new BufferedReader(new FileReader("testip.txt"));
-		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
+//		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		 BufferedReader br = new BufferedReader(new FileReader("testip.txt"));
+//		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
+		PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File("testop.txt"))));
 
 		while ((n = Integer.parseInt(br.readLine())) != 0) {
 			OK = (1 << (n * n)) - 1;
