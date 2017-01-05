@@ -4,16 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.BitSet;
-import java.util.Iterator;
 
-/**
- * Graph Coloring
- * 
- * @author arun
- *
- */
-public class UVA193 {
+public class UVA129 {
 	private static int totalchars = 0, offset = 0;
 	private static InputStream stream;
 	private static byte[] buffer = new byte[1024];
@@ -63,23 +55,40 @@ public class UVA193 {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
 	}
 
-	private static int n, k;
-	private static BitSet[] adjList;
-	private static BitSet result;
-	private static int maxBlack;
+	private static int n, l, count;
+	private static String result;
 
-	private static void solve(BitSet currentSet, int col, int cardinality) {
-		for (int i = col; i < n; ++i) {
-			if (!currentSet.intersects(adjList[i])) {
-				currentSet.set(i);
-				solve(currentSet, i + 1, cardinality + 1);
-				currentSet.clear(i);
+	private static void solve(StringBuilder chs, int chsLen) {
+		if (count == n) {
+			result = chs.toString();
+			return;
+		}
+
+		for (int i = 0; i < l && count < n; ++i) {
+			boolean hard = true;
+			char ch = (char) ('A' + i);
+			for (int j = chsLen - 1, jLow = (chsLen / 2); j >= jLow; --j) {
+				if (chs.charAt(j) == ch) {
+					int jump = chsLen - j, k = j + 1;
+					for (; k < chsLen; ++k) {
+						if (chs.charAt(k) != chs.charAt(k - jump)) {
+							break;
+						}
+					}
+					if (k == chsLen) {
+						hard = false;
+						break;
+					}
+				}
+			}
+			if (hard) {
+				count++;
+				chs.append(ch);
+				solve(chs, chsLen + 1);
+				chs.deleteCharAt(chsLen);
 			}
 		}
-		if (maxBlack < cardinality) {
-			maxBlack = cardinality;
-			result = (BitSet) currentSet.clone();
-		}
+
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -90,34 +99,29 @@ public class UVA193 {
 		}
 
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
-
-		int testcases = readInt();
-
-		while (testcases-- > 0) {
+		StringBuilder temp = new StringBuilder();
+		while (true) {
 			n = readInt();
-			k = readInt();
-			adjList = new BitSet[n];
-			for (int i = 0; i < n; ++i) {
-				adjList[i] = new BitSet(n);
+			l = readInt();
+			result = "";
+			count = 0;
+			if (n == 0 && l == 0) {
+				break;
 			}
-			for (int i = 0; i < k; ++i) {
-				int from = readInt() - 1, to = readInt() - 1;
-				adjList[from].set(to);
-				adjList[to].set(from);
+			solve(temp, 0);
+			int len = result.length();
+			if (len > 0) {
+				pw.print(result.charAt(0));
 			}
-			maxBlack = 0;
-			BitSet tempset = new BitSet(n);
-			solve(tempset, 0, 0);
-			pw.println(maxBlack);
-			Iterator<Integer> stream = result.stream().iterator();
-			if (stream.hasNext()) {
-				pw.print((stream.next() + 1));
+			for (int i = 1; i < len; ++i) {
+				if (i % 64 == 0) {
+					pw.println();
+				} else if (i % 4 == 0) {
+					pw.print(" ");
+				}
+				pw.print(result.charAt(i));
 			}
-			while (stream.hasNext()) {
-				pw.print(" " + (stream.next() + 1));
-			}
-			pw.println();
-
+			pw.println("\n" + len);
 		}
 
 		pw.flush();
