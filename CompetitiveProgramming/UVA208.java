@@ -104,7 +104,7 @@ public class UVA208 {
 		}
 
 		PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
-//		PrintWriter pw = new PrintWriter("testop.txt");
+//		PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("testop.txt")))));
 		int tc = 1;
 		ArrayList<Integer> temp = new ArrayList<Integer>(20);
 		temp.add(0);
@@ -151,13 +151,15 @@ public class UVA208 {
 			valid = visited;
 
 			result = new ArrayList<String>();
+//			long start = System.currentTimeMillis();
 			solve(1, temp, 0);
 			int resultSize = result.size();
 			for (int i = 0; i < resultSize; ++i) {
 				pw.println(result.get(i));
 			}
-
 			pw.println("There are " + resultSize + " routes from the firestation to streetcorner " + (n + 1) + ".");
+//			long end = System.currentTimeMillis();
+//			System.out.println("Total Time taken : "+((end-start)/1000d)+" seconds.");
 		}
 
 		pw.flush();
