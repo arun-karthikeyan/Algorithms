@@ -1,7 +1,9 @@
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -101,8 +103,8 @@ public class UVA208 {
 			stream = System.in;
 		}
 
-//		PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
-		PrintWriter pw = new PrintWriter("testop.txt");
+		PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
+//		PrintWriter pw = new PrintWriter("testop.txt");
 		int tc = 1;
 		ArrayList<Integer> temp = new ArrayList<Integer>(20);
 		temp.add(0);
