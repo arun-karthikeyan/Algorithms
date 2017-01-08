@@ -1,5 +1,5 @@
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.FileReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Arrays;
@@ -172,8 +172,8 @@ public class UVA403 {
 		return str.substring(idx1+1, idx2);
 	}
 	public static void main(String[] args) throws Exception {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-//		 BufferedReader br = new BufferedReader(new FileReader("testip.txt"));
+//		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		 BufferedReader br = new BufferedReader(new FileReader("testip.txt"));
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
 		String command = "";
 
