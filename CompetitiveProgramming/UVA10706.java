@@ -4,14 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 /**
- * Dropping Balls, faster approach
+ * Number Sequence
  * 
  * @author arun
  *
  */
-public class UVA679_2 {
+public class UVA10706 {
 	private static int totalchars = 0, offset = 0;
 	private static InputStream stream;
 	private static byte[] buffer = new byte[1024];
@@ -57,35 +58,17 @@ public class UVA679_2 {
 		return sign * val;
 	}
 
-	private static long readLong() {
-		int number = readByte();
-
-		while (eolchar(number))
-			number = readByte();
-
-		int sign = 1;
-		long val = 0;
-
-		if (number == '-') {
-			sign = -1;
-			number = readByte();
-		}
-
-		do {
-			if ((number < '0') || (number > '9')) {
-				// return sign*val;
-				return 0;
-			}
-			val *= 10;
-			val += (number - '0');
-			number = readByte();
-		} while (!eolchar(number));
-
-		return sign * val;
-	}
-
 	private static boolean eolchar(int c) {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
+	}
+
+	private static int getDigits(int val) {
+		int count = 0;
+		while (val > 0) {
+			count++;
+			val /= 10;
+		}
+		return count;
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -96,22 +79,32 @@ public class UVA679_2 {
 		}
 
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
+		int max = 31268;// ~upper bound
+		long[] sk = new long[max];
+		for (int i = 1; i < max; ++i) {
+			sk[i] = sk[i - 1] + getDigits(i);
+		}
+		for (int i = 1; i < max; ++i) {
+			sk[i] += sk[i - 1];
+		}
 
 		int testcases = readInt();
-
 		while (testcases-- > 0) {
-			long d = readLong(), c = readLong();
-			long node = 1, maxNode = 1 << (d - 1);
-			while (node < maxNode) {
-				if ((c & 1) == 1) {
-					c = (c + 1) >> 1;
-					node <<= 1;
-				} else {
-					c >>= 1;
-					node = (node << 1) + 1;
-				}
+			long digitIdx = readInt();
+			int idx = Arrays.binarySearch(sk, digitIdx);
+			if (idx < 0) {
+				idx *= -1;
+				idx--;
 			}
-			pw.println(node);
+			idx--;
+			digitIdx = digitIdx - sk[idx];
+			int i = -1, j = -1, digits = 0;
+			for (i = 0, j = 1; i < idx && (digitIdx - (digits = getDigits(j))) > 0; j++) {
+				digitIdx -= digits;
+			}
+			digitIdx--;
+			String strVal = String.valueOf(j);
+			pw.println(strVal.charAt((int)digitIdx));
 		}
 
 		pw.flush();
