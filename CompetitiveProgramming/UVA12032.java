@@ -5,6 +5,12 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
+/**
+ * The Monkey and the Oiled Bamboo - Binary Search the Answer Technique
+ * 
+ * @author arun
+ *
+ */
 public class UVA12032 {
 	private static int totalchars = 0, offset = 0;
 	private static InputStream stream;
