@@ -154,7 +154,6 @@ public class UVA10382 {
 				}
 				lengthCovered = intervals.get(idx).end;
 				sprinklerCount++;
-
 			}
 			if (!possible || lengthCovered < l) {
 				pw.println("-1");
