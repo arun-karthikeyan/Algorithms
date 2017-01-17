@@ -55,33 +55,6 @@ public class UVA11413 {
 		return sign * val;
 	}
 
-	private static long readLong() {
-		int number = readByte();
-
-		while (eolchar(number))
-			number = readByte();
-
-		int sign = 1;
-		long val = 0;
-
-		if (number == '-') {
-			sign = -1;
-			number = readByte();
-		}
-
-		do {
-			if ((number < '0') || (number > '9')) {
-				// return sign*val;
-				return 0;
-			}
-			val *= 10;
-			val += (number - '0');
-			number = readByte();
-		} while (!eolchar(number));
-
-		return sign * val;
-	}
-
 	private static boolean eolchar(int c) {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
 	}
