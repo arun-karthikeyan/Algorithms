@@ -2,11 +2,11 @@ import java.io.*;
 import java.util.*;
 /**
 * Basic 0/1 Knapsack DP O(nk) pseudo polynomial algorithm
-*
+* With multiple selection of the same element with reduced space trick, uses only k space
 **/
 public class ZBOKnapsack {
 
-    public static void main(String[] args) throws Exception {
+   public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
         
@@ -20,23 +20,16 @@ public class ZBOKnapsack {
             for(int i=0; i<n; ++i){
                 array[i] = Integer.parseInt(info[i]);
             }
-            int[][] dp = new int[n][k+1];
+            int[] dp = new int[k+1];
             for(int i=0; i<n; ++i){
                 int start = array[i];
-                if(i>0){
-                    for(int j=0; j<start && j<=k; ++j){
-                        dp[i][j] = dp[i-1][j];
-                    }    
-                }
                 for(int j=start; j<=k; ++j){
-                    dp[i][j] = Math.max(start, dp[i][j-start]+start);
-                    if(i>0) dp[i][j] = Math.max(dp[i][j], Math.max(dp[i-1][j], dp[i-1][j-start]+start));
-                    if(j>0) dp[i][j] = Math.max(dp[i][j], dp[i][j-1]);
+                    dp[j] = Math.max(dp[j], dp[j-start]+start);
+                    if(j>0) dp[j] = Math.max(dp[j], dp[j-1]);
                 }
             }
-            pw.println(dp[n-1][k]);
-        }
-        
+            pw.println(dp[k]);
+        }        
         br.close();
         pw.flush();
         pw.close();
