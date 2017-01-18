@@ -35,8 +35,8 @@ public class ZBOKnapsack {
 		int m1 = Integer.MAX_VALUE;
 		if (currentWeight <= remainingWeight) {
 			// can pick this weight one or more times
-			m1 = Math.min(runTopDownKnapsack(array, idx, remainingWeight - currentWeight),
-					runTopDownKnapsack(array, idx + 1, remainingWeight - currentWeight));
+			m1 = runTopDownKnapsack(array, idx, remainingWeight - currentWeight);
+
 		}
 		// can ignore it
 		return Math.min(m1, runTopDownKnapsack(array, idx + 1, remainingWeight));
@@ -56,7 +56,7 @@ public class ZBOKnapsack {
 			for (int i = 0; i < n; ++i) {
 				array[i] = Integer.parseInt(info[i]);
 			}
-			pw.println(topDown(array, k));
+			pw.println(bottomUp(array, k));
 		}
 
 		br.close();
