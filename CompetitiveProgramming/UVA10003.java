@@ -6,8 +6,10 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashMap;
+
 /**
  * Cuting Sticks - DP Top Down
+ * 
  * @author arun
  *
  */
@@ -75,21 +77,21 @@ public class UVA10003 {
 		if (validCuts == 0) {
 			return 0;
 		}
-		if (memoi[start][end] == -1) {
-			int curCutCost = end - start + 1;
-			int min = 1000000;
-			while (validCuts > 0) {
-				long nextCut = (validCuts) & (-validCuts);
-				int cutStartPoint = cuts[LOOKUP.get(nextCut)];
-				validCuts -= nextCut;
-				long leftCutsbm = nextCut - 1;
-				long rightCutsbm = validCuts;
-				min = Math.min(min, curCutCost + solve(start, cutStartPoint, leftCutsbm, usedCuts | nextCut)
-						+ solve(cutStartPoint + 1, end, rightCutsbm, usedCuts | nextCut));
-			}
-			return memoi[start][end] = min;
+		int curCutCost = end - start;
+		int min = 1000000;
+		while (validCuts > 0) {
+			long nextCut = (validCuts) & (-validCuts);
+			int cutStartPoint = cuts[LOOKUP.get(nextCut)];
+			validCuts -= nextCut;
+			long leftCutsbm = nextCut - 1;
+			long rightCutsbm = validCuts;
+			int left = memoi[start][cutStartPoint] == -1 ? solve(start, cutStartPoint, leftCutsbm, usedCuts | nextCut)
+					: memoi[start][cutStartPoint];
+			int right = memoi[cutStartPoint][end] == -1 ? solve(cutStartPoint, end, rightCutsbm, usedCuts | nextCut)
+					: memoi[cutStartPoint][end];
+			min = Math.min(min, curCutCost + left + right);
 		}
-		return memoi[start][end];
+		return memoi[start][end] = min;
 	}
 
 	private static long OK;
@@ -115,7 +117,7 @@ public class UVA10003 {
 			OK = cutsbm;
 			for (int i = 0; i <= l; ++i)
 				Arrays.fill(memoi[i], -1);
-			pw.println("The minimum cutting is " + solve(1, l, cutsbm, 0) + ".");
+			pw.println("The minimum cutting is " + solve(0, l, cutsbm, 0) + ".");
 		}
 
 		pw.flush();
