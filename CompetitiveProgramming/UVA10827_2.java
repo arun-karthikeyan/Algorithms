@@ -4,8 +4,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+
 /**
- * Maximum sum on a Torus - O(n^3) solution using Kadane's algorithm and Maximum Circular Sub-Array Sum 
+ * Maximum sum on a Torus - O(n^3) solution using Kadane's algorithm and Maximum
+ * Circular Sub-Array Sum
+ * 
+ * An interesting algorithm obtained by trying to find the maximum reduction
+ * using kadane by inverting the array, then adding that to the cumulative value
+ * to get the max sum excluding the reduction.
+ * 
+ * The solution is the maximum of kadane on the original array and the max
+ * obtained by the above said method
+ * 
  * @author arun
  *
  */
@@ -120,7 +130,7 @@ public class UVA10827_2 {
 					}
 				}
 			}
-			int overAllMax = -100 * 75 * 75 + 1;
+			int overAllMax = Integer.MIN_VALUE;
 			for (int i = 0; i < n; ++i) {
 				for (int j = 0; j < n; ++j) {
 					int start = j, end = j + i; // => [start,end]
