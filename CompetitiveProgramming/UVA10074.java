@@ -1,0 +1,113 @@
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+
+public class UVA10074 {
+	private static int totalchars = 0, offset = 0;
+	private static InputStream stream;
+	private static byte[] buffer = new byte[1024];
+
+	private static int readByte() {
+		if (totalchars < 0)
+			return 0;
+		if (offset >= totalchars) {
+			offset = 0;
+			try {
+				totalchars = stream.read(buffer);
+			} catch (IOException e) {
+				return 0;
+			}
+			if (totalchars <= 0)
+				return -1;
+		}
+		return buffer[offset++];
+	}
+
+	private static int readInt() {
+		int number = readByte();
+
+		while (eolchar(number))
+			number = readByte();
+
+		int sign = 1;
+		int val = 0;
+
+		if (number == '-') {
+			sign = -1;
+			number = readByte();
+		}
+
+		do {
+			if ((number < '0') || (number > '9'))
+				return 0;
+			val *= 10;
+			val += (number - '0');
+			number = readByte();
+		} while (!eolchar(number));
+
+		return sign * val;
+	}
+
+	private static boolean eolchar(int c) {
+		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
+	}
+
+	public static void main(String[] args) throws Exception {
+		if (args.length > 0 && "fileip".equals(args[0])) {
+			stream = new FileInputStream(new File("testip.txt"));
+		} else {
+			stream = System.in;
+		}
+
+		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
+
+		int n, m;
+		while (true) {
+			n = readInt();
+			m = readInt();
+			if (n == 0 && m == 0) {
+				break;
+			}
+			int[][] forest = new int[n][m];
+			for (int i = 0; i < n; ++i) {
+				for (int j = 0; j < m; ++j) {
+					forest[i][j] = readInt();
+					if (j > 0)
+						forest[i][j] += forest[i][j - 1];
+				}
+			}
+			int allMax = Integer.MIN_VALUE;
+			for (int i = 0; i < m; ++i) {
+				for (int j = 0; j < m-i; ++j) {
+					int end = j+i;
+					int count = 0, max = Integer.MIN_VALUE;
+					for (int k = 0; k < n; ++k) {
+						int sum = forest[k][end];
+						if (j > 0)
+							sum -= forest[k][j - 1];
+						if (sum == 0) {
+							count++;
+							max = max(max, count * (end - j + 1));
+						} else {
+							count = 0;
+						}
+					}
+					allMax = max(allMax, max);
+				}
+			}
+			allMax = allMax==Integer.MIN_VALUE?0:allMax;
+			pw.println(allMax);
+
+		}
+
+		pw.flush();
+		pw.close();
+	}
+
+	private static int max(int a, int b) {
+		return a > b ? a : b;
+	}
+}
