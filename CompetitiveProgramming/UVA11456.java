@@ -4,15 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-
+import java.util.ArrayList;
+import java.util.Comparator;
 /**
- * Murcia's Skyline - Longest Increasing/Decreasing Subsequence
- * O(n^2) solution
- * 
+ * Train sorting, required some thinking to understand the solution
+ * not really straight forward for first timers
  * @author arun
  *
  */
-public class UVA11790 {
+public class UVA11456 {
 	private static int totalchars = 0, offset = 0;
 	private static InputStream stream;
 	private static byte[] buffer = new byte[1024];
@@ -62,6 +62,21 @@ public class UVA11790 {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
 	}
 
+	private static int binarySearchInsertPos(ArrayList<Integer> array, int key, Comparator<Integer> c) {
+		int low = 0, high = array.size() - 1;
+		while (low <= high) {
+			int mid = (low + high) >> 1, compare = c.compare(key, array.get(mid));
+			if (compare < 0) {
+				high = mid - 1;
+			} else if (compare > 0) {
+				low = mid + 1;
+			} else {
+				return mid;
+			}
+		}
+		return low;
+	}
+	
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0 && "fileip".equals(args[0])) {
 			stream = new FileInputStream(new File("testip.txt"));
@@ -70,44 +85,35 @@ public class UVA11790 {
 		}
 
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
-
-		int testcases = readInt(), tc = 1;
+		Comparator<Integer> ac = Comparator.naturalOrder();
+		Comparator<Integer> dc = Comparator.reverseOrder();
+		int testcases = readInt();
 
 		while (testcases-- > 0) {
 			int n = readInt();
-			int[] w = new int[n], h = new int[n];
-			int[] lis = new int[n], lds = new int[n];
-			for (int i = 0; i < n; ++i) {
-				h[i] = readInt();
+			ArrayList<Integer> lis = new ArrayList<Integer>();
+			ArrayList<Integer> lds = new ArrayList<Integer>();
+			int max = 0, array[] = new int[n];
+			for(int i=0; i<n; ++i){
+				array[i] = readInt();
 			}
-			for (int i = 0; i < n; ++i) {
-				w[i] = readInt();
-			}
-			lds[0] = lis[0] = w[0];
-			for (int i = 1; i < n; ++i) {
-				int iMax = 0, dMax = 0;
-				int curHeight = h[i];
-				for (int j = 0; j < i; ++j) {
-					if (curHeight > h[j] && iMax < lis[j]) {
-						iMax = lis[j];
-					}
-					if (curHeight < h[j] && dMax < lds[j]) {
-						dMax = lds[j];
-					}
+			for (int i = n-1; i >=0; --i) {
+				int currentVal = array[i];
+				int lisIp = binarySearchInsertPos(lis, currentVal, ac);
+				int ldsIp = binarySearchInsertPos(lds, currentVal, dc);
+				max = Math.max(max, ldsIp + lisIp + 1);
+				if (lisIp < lis.size()) {
+					lis.set(lisIp, currentVal);
+				} else {
+					lis.add(currentVal);
 				}
-				lis[i] = w[i] + iMax;
-				lds[i] = w[i] + dMax;
+				if (ldsIp < lds.size()) {
+					lds.set(ldsIp, currentVal);
+				} else {
+					lds.add(currentVal);
+				}
 			}
-			int iMax = Integer.MIN_VALUE, dMax = Integer.MIN_VALUE;
-			for (int i = 0; i < n; ++i) {
-				iMax = Math.max(iMax, lis[i]);
-				dMax = Math.max(dMax, lds[i]);
-			}
-			if (iMax >= dMax) {
-				pw.println("Case " + (tc++) + ". Increasing (" + iMax + "). Decreasing (" + dMax + ").");
-			} else {
-				pw.println("Case " + (tc++) + ". Decreasing (" + dMax + "). Increasing (" + iMax + ").");
-			}
+			pw.println(max);
 		}
 
 		pw.flush();
