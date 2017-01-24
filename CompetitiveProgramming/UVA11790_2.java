@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Comparator;
-
-import org.omg.PortableServer.LifespanPolicyOperations;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 /**
  * Murcia's Skyline - Longest Increasing/Decreasing Subsequence O(nlogk)
- * solution
+ * solution - incomplete
  * 
  * @author arun
  *
@@ -66,41 +64,8 @@ public class UVA11790_2 {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
 	}
 
-	// to get the longest increasing and longest decreasing subsequences
-	private static int binarySearchHeight(ArrayList<Integer> array, int key, Comparator<Integer> comp) {
-		int low = 0, high = array.size() - 1;
-		while (low <= high) {
-			int mid = (low + high) >> 1, c = comp.compare(key, array.get(mid));
-			if (c < 0) {
-				high = mid - 1;
-			} else if (c > 0) {
-				low = mid + 1;
-			} else {
-				return mid;
-			}
-		}
-		return low;
-	}
-
 	private static int max(int a, int b) {
 		return a > b ? a : b;
-	}
-
-	private static final int IDX = 0, WEIGHT = 1;
-
-	// need to get search index of weights
-	private static int binarySearchWeightIdx(ArrayList<int[]> array, int key) {
-		int low = 0, high = array.size() - 1;
-		while (low <= high) {
-			int mid = (low + high) >> 1, val = array.get(mid)[WEIGHT];
-			if (key < val) {
-				high = mid - 1;
-			} else {
-				low = mid + 1;
-			}
-		}
-		// low is always greater than 0
-		return low - 1;
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -117,13 +82,6 @@ public class UVA11790_2 {
 		while (testcases-- > 0) {
 			int n = readInt();
 			int[] h = new int[n], w = new int[n];
-
-			ArrayList<ArrayList<int[]>> lis = new ArrayList<ArrayList<int[]>>();
-			ArrayList<ArrayList<int[]>> lds = new ArrayList<ArrayList<int[]>>();
-			ArrayList<Integer> lisGreedy = new ArrayList<Integer>();
-			ArrayList<Integer> ldsGreedy = new ArrayList<Integer>();
-			Comparator<Integer> ldsComp = Comparator.reverseOrder();
-			Comparator<Integer> lisComp = Comparator.naturalOrder();
 			int iMax = Integer.MIN_VALUE, dMax = Integer.MIN_VALUE;
 
 			for (int i = 0; i < n; ++i) {
@@ -132,21 +90,44 @@ public class UVA11790_2 {
 			for (int i = 0; i < n; ++i) {
 				w[i] = readInt();
 			}
-
+			TreeMap<Integer, Integer> weightedLIS = new TreeMap<Integer, Integer>();
+			TreeMap<Integer, Integer> weightedLDS = new TreeMap<Integer, Integer>();
 			for (int i = 0; i < n; ++i) {
 				int currentHeight = h[i], currentWeight = w[i];
-				int lisIp = binarySearchHeight(lisGreedy, currentHeight, lisComp);
-				if (lisIp == lisGreedy.size()) {
-					lisGreedy.add(currentHeight);
-					ArrayList<int[]> lisPos = new ArrayList<int[]>();
-					if (lisIp > 0) {
-						ArrayList<int[]> prevPosition = lis.get(lisIp - 1);
-						lisPos.add(new int[] { i, currentWeight + prevPosition.get(prevPosition.size() - 1)[WEIGHT] });
-						lis.add(lisPos);
+				Entry<Integer, Integer> lis = weightedLIS.lowerEntry(currentHeight);
+				Entry<Integer, Integer> lds = weightedLDS.higherEntry(currentHeight);
+				int newWeightLIS, newWeightLDS;
+				if (lis == null) {
+					Integer oldVal = weightedLIS.get(currentHeight);
+					newWeightLIS = currentWeight;
+					if (oldVal != null) {
+						newWeightLIS = max(newWeightLIS, oldVal);
 					}
 				} else {
-
+					Integer oldVal = weightedLIS.get(currentHeight);
+					newWeightLIS = lis.getValue() + currentWeight;
+					if (oldVal != null) {
+						newWeightLIS = max(oldVal, newWeightLIS);
+					}
 				}
+				
+				if (lds == null) {
+					Integer oldVal = weightedLDS.get(currentHeight);
+					newWeightLDS = currentWeight;
+					if (oldVal != null) {
+						newWeightLDS = max(newWeightLDS, oldVal);
+					}
+				} else {
+					Integer oldVal = weightedLDS.get(currentHeight);
+					newWeightLDS = lds.getValue() + currentWeight;
+					if (oldVal != null) {
+						newWeightLDS = max(oldVal, newWeightLDS);
+					}
+				}
+				weightedLIS.put(currentHeight, newWeightLIS);
+				weightedLDS.put(currentHeight, newWeightLDS);
+				iMax = max(iMax, newWeightLIS);
+				dMax = max(dMax, newWeightLDS);
 			}
 
 			if (iMax >= dMax) {
