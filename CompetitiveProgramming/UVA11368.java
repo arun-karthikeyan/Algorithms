@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Comparator;
 
 /**
@@ -156,7 +157,8 @@ public class UVA11368 {
 			buildSegTree(1, 0, n - 1);
 			int count = 0;
 			int[] weightJumper = new int[n];
-			boolean[] dp = new boolean[n];
+			// boolean[] dp = new boolean[n];
+			BitSet dp = new BitSet(n);
 			weightJumper[n - 1] = -1;
 			for (int i = n - 2; i >= 0; --i) {
 				if (dolls[i][W] < dolls[i + 1][W]) {
@@ -165,19 +167,17 @@ public class UVA11368 {
 					weightJumper[i] = weightJumper[i + 1];
 				}
 			}
-			for (int i = 0; i < n; ++i) {
-				if (!dp[i]) {
-					count++;
-					for (int j = weightJumper[i], currentHeight = dolls[i][H]; j >= 0 && j < n;) {
-						int pos = query(1, 0, n - 1, j, n - 1, currentHeight);
-						if (pos != -1) {
-							currentHeight = dolls[pos][H];
-							dp[pos] = true;
-							update(1, 0, n - 1, pos);
-							j = weightJumper[pos];
-						} else {
-							break;
-						}
+			for (int i = 0; i < n; i = dp.nextClearBit(i + 1)) {
+				count++;
+				for (int j = weightJumper[i], currentHeight = dolls[i][H]; j >= 0 && j < n;) {
+					int pos = query(1, 0, n - 1, j, n - 1, currentHeight);
+					if (pos != -1) {
+						currentHeight = dolls[pos][H];
+						dp.set(pos);
+						update(1, 0, n - 1, pos);
+						j = weightJumper[pos];
+					} else {
+						break;
 					}
 				}
 			}

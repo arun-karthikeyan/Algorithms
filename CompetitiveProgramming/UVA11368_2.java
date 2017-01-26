@@ -8,7 +8,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-public class HelperMethod {
+/**
+ * non-segment tree nlogk solution using LIS approach
+ * 
+ * @author arun
+ *
+ */
+public class UVA11368_2 {
 	private static int totalchars = 0, offset = 0;
 	private static InputStream stream;
 	private static byte[] buffer = new byte[1024];
@@ -54,35 +60,21 @@ public class HelperMethod {
 		return sign * val;
 	}
 
-	private static long readLong() {
-		int number = readByte();
-
-		while (eolchar(number))
-			number = readByte();
-
-		int sign = 1;
-		long val = 0;
-
-		if (number == '-') {
-			sign = -1;
-			number = readByte();
-		}
-
-		do {
-			if ((number < '0') || (number > '9')) {
-				// return sign*val;
-				return 0;
-			}
-			val *= 10;
-			val += (number - '0');
-			number = readByte();
-		} while (!eolchar(number));
-
-		return sign * val;
-	}
-
 	private static boolean eolchar(int c) {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
+	}
+
+	private static int binarySearchPosition(ArrayList<Integer> lis, int key) {
+		int low = 0, high = lis.size() - 1;
+		while (low <= high) {
+			int mid = (low + high) >> 1, val = lis.get(mid);
+			if (key < val) {
+				high = mid - 1;
+			} else if (key >= val) {
+				low = mid + 1;
+			}
+		}
+		return low;
 	}
 
 	private static final int W = 0, H = 1;
@@ -105,9 +97,9 @@ public class HelperMethod {
 				return c;
 			}
 		};
-		int tests = readInt();
-		while (tests-- > 0) {
-			ArrayList<int[]> temp = new ArrayList<int[]>();
+		int testcases = readInt();
+
+		while (testcases-- > 0) {
 			int n = readInt();
 			int[][] dolls = new int[n][2];
 			for (int i = 0; i < n; ++i) {
@@ -115,27 +107,20 @@ public class HelperMethod {
 				dolls[i][H] = readInt();
 			}
 			Arrays.sort(dolls, dollComparator);
-			temp.add(new int[] { dolls[0][W], dolls[0][H] });
-			for (int i = 1; i < n; ++i) {
-				int binChoice = -1;
-				for (int j = 0, jLen = temp.size(); j < jLen; ++j) {
-					int[] currentBin = temp.get(j);
-					if (dolls[i][H] > currentBin[H] && dolls[i][W] > currentBin[W]) {
-						binChoice = j;
-						break;
-					}
-				}
-				if (binChoice == -1) {
-					temp.add(dolls[i]);
+			ArrayList<Integer> lis = new ArrayList<Integer>();
+			for (int i = 0; i < n; ++i) {
+				int currentDoll = dolls[i][W];
+				int ip = binarySearchPosition(lis, currentDoll);
+				if (ip < lis.size()) {
+					lis.set(ip, currentDoll);
 				} else {
-					temp.set(binChoice, dolls[i]);
+					lis.add(currentDoll);
 				}
 			}
-			pw.println(temp.size());
+			pw.println(lis.size());
 		}
 
 		pw.flush();
 		pw.close();
 	}
-
 }
