@@ -4,9 +4,32 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.HashSet;
+import java.util.Arrays;
+/**
+ * Trouble of 13-Dots - Top down approach
+ * @author arun
+ *
+ */
+public class UVA10819 {
+	private static int m, n, items[][] = new int[100][2], memoi[][] = new int[100][10201];
+	private static final int COST = 0, FAVOUR = 1;
 
-public class HelperMethod {
+	private static int maxFavour(int purchaseAmount, int idx) {
+		if (purchaseAmount > (m + 200)) {
+			return Integer.MIN_VALUE;
+		}
+		if (idx == n) {
+			if (purchaseAmount <= m || purchaseAmount > 2000) {
+				return 0;
+			}
+			return Integer.MIN_VALUE;
+		}
+		if (memoi[idx][purchaseAmount] == -1) {
+			memoi[idx][purchaseAmount] = Math.max(maxFavour(purchaseAmount, idx + 1),
+					items[idx][FAVOUR] + maxFavour(purchaseAmount + items[idx][COST], idx + 1));
+		}
+		return memoi[idx][purchaseAmount];
+	}
 	private static int totalchars = 0, offset = 0;
 	private static InputStream stream;
 	private static byte[] buffer = new byte[1024];
@@ -43,34 +66,7 @@ public class HelperMethod {
 
 		do {
 			if ((number < '0') || (number > '9'))
-				return 0;
-			val *= 10;
-			val += (number - '0');
-			number = readByte();
-		} while (!eolchar(number));
-
-		return sign * val;
-	}
-
-	private static long readLong() {
-		int number = readByte();
-
-		while (eolchar(number))
-			number = readByte();
-
-		int sign = 1;
-		long val = 0;
-
-		if (number == '-') {
-			sign = -1;
-			number = readByte();
-		}
-
-		do {
-			if ((number < '0') || (number > '9')) {
-				// return sign*val;
-				return 0;
-			}
+				return -1;
 			val *= 10;
 			val += (number - '0');
 			number = readByte();
@@ -82,28 +78,7 @@ public class HelperMethod {
 	private static boolean eolchar(int c) {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
 	}
-	private static final int W = 0, H = 1;
-	static class State {
-		int idx;
-		int totalFlavour;
-		int purchaseAmount;
 
-		public State(int idx, int totalFlavour, int purchaseAmount) {
-			this.idx = idx;
-			this.totalFlavour = totalFlavour;
-			this.purchaseAmount = purchaseAmount;
-		}
-
-		public boolean equals(Object c) {
-			State obj = (State) c;
-			return this.idx == obj.idx && this.totalFlavour == obj.totalFlavour
-					&& this.purchaseAmount == obj.purchaseAmount;
-		}
-
-		public int hashCode() {
-			return idx << 22 | totalFlavour << 15 | purchaseAmount;
-		}
-	}
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0 && "fileip".equals(args[0])) {
 			stream = new FileInputStream(new File("testip.txt"));
@@ -112,13 +87,22 @@ public class HelperMethod {
 		}
 
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
-		HashSet<State> vals = new HashSet<State>();
-		vals.add(new State(0,1,2));
-		vals.add(new State(0,1,2));
-		pw.println(vals.size());
+
+		while(true) {
+			m = readInt();
+			n = readInt();
+			if(m==-1 && n==-1){
+				break;
+			}
+			for (int i = 0; i < n; ++i) {
+				items[i][COST] = readInt();
+				items[i][FAVOUR] = readInt();
+				Arrays.fill(memoi[i], -1);
+			}
+			pw.println(maxFavour(0, 0));
+		}
 
 		pw.flush();
 		pw.close();
 	}
-
 }
