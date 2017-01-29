@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Ferry Loading - Top Down Approach Also learned from this problem that array
+ * Ferry Loading - Top Down Approach. Also learned from this problem that array
  * accesses are costly, and we must skip them with an if else check whenever
  * possible
  * 
@@ -118,11 +118,10 @@ public class UVA10261 {
 			while ((n = readInt()) != 0) {
 				if (size < 200) {
 					cars.add(n);
-					Arrays.fill(memo[size], -1);
-					size++;
+					Arrays.fill(memo[size++], -1);
 				}
 			}
-			n = cars.size();
+			n = size;
 			int maxCars = solve(0, len, len);
 			pw.println(maxCars);
 			for (int i = 0, j = len; i < maxCars; ++i) {
