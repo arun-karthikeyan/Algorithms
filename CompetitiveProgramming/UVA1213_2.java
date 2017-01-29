@@ -4,16 +4,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.Arrays;
+import java.util.BitSet;
 
 /**
- * Struggled to find the state, still weak with DP. A good practice problem. Top
- * Down solution
+ * Sum of different primes bottom up approach - O(187*1121*15) precomputation
+ * and O(1) query
  * 
  * @author arun
  *
  */
-public class UVA11003 {
+public class UVA1213_2 {
 	private static int totalchars = 0, offset = 0;
 	private static InputStream stream;
 	private static byte[] buffer = new byte[1024];
@@ -59,26 +59,32 @@ public class UVA11003 {
 		return sign * val;
 	}
 
-	private static boolean eolchar(int c) {
-		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
+	private static final int MAX = 1120;
+	private static int[] primes = new int[187], result[] = new int[15][1121];
+
+	private static void runSeive() {
+		BitSet seive = new BitSet(MAX + 1);
+		for (int i = 2, k = 0; i <= MAX && i >= 0; i = seive.nextClearBit(i + 1)) {
+			primes[k++] = i;
+			for (int j = 2 * i; j <= MAX; j += i) {
+				seive.set(j);
+			}
+		}
 	}
 
-	private static final int GROUNDCAPACITY = (int) (2 * 3e3), MAXBOXES = (int) 1e3;
-	private static int n, memoi[][] = new int[MAXBOXES + 1][GROUNDCAPACITY + 1], weight[] = new int[MAXBOXES + 1],
-			capacity[] = new int[MAXBOXES + 1];
+	private static void preCompute() {
+		result[0][0] = 1;
+		for (int i = 0; i < 187; ++i) {
+			for (int k = 14; k > 0; --k) {
+				for (int j = 1120, jLimit = primes[i]; j >= jLimit; --j) {
+					result[k][j] += result[k - 1][j - jLimit];
+				}
+			}
+		}
+	}
 
-	private static int solve(int idx, int remCapacity) {
-		if (remCapacity < 0) {
-			return Integer.MIN_VALUE;
-		}
-		if (idx == n) {
-			return 0;
-		}
-		if (memoi[idx][remCapacity] == -1) {
-			memoi[idx][remCapacity] = Math.max(solve(idx + 1, remCapacity),
-					1 + solve(idx + 1, Math.min(capacity[idx], remCapacity - weight[idx])));
-		}
-		return memoi[idx][remCapacity];
+	private static boolean eolchar(int c) {
+		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -89,16 +95,15 @@ public class UVA11003 {
 		}
 
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
-
-		while ((n = readInt()) != 0) {
-			int max = 0;
-			for (int i = 0; i < n; ++i) {
-				weight[i] = readInt();
-				capacity[i] = readInt();
-				max = Math.max(max, weight[i] + capacity[i]);
-				Arrays.fill(memoi[i], -1);
+		runSeive();
+		preCompute();
+		while (true) {
+			int n = readInt();
+			int k = readInt();
+			if (n == 0 && k == 0) {
+				break;
 			}
-			pw.println(solve(0, max));
+			pw.println(result[k][n]);
 		}
 
 		pw.flush();

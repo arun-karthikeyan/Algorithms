@@ -7,13 +7,12 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 
 /**
- * Struggled to find the state, still weak with DP. A good practice problem. Top
- * Down solution
+ * Bottom up approach - new technique re-using from 13dots
  * 
  * @author arun
  *
  */
-public class UVA11003 {
+public class UVA10130_2 {
 	private static int totalchars = 0, offset = 0;
 	private static InputStream stream;
 	private static byte[] buffer = new byte[1024];
@@ -63,23 +62,8 @@ public class UVA11003 {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
 	}
 
-	private static final int GROUNDCAPACITY = (int) (2 * 3e3), MAXBOXES = (int) 1e3;
-	private static int n, memoi[][] = new int[MAXBOXES + 1][GROUNDCAPACITY + 1], weight[] = new int[MAXBOXES + 1],
-			capacity[] = new int[MAXBOXES + 1];
-
-	private static int solve(int idx, int remCapacity) {
-		if (remCapacity < 0) {
-			return Integer.MIN_VALUE;
-		}
-		if (idx == n) {
-			return 0;
-		}
-		if (memoi[idx][remCapacity] == -1) {
-			memoi[idx][remCapacity] = Math.max(solve(idx + 1, remCapacity),
-					1 + solve(idx + 1, Math.min(capacity[idx], remCapacity - weight[idx])));
-		}
-		return memoi[idx][remCapacity];
-	}
+	private static final int V = 0, W = 1;
+	private static int dp[] = new int[31], items[][] = new int[1000][2];
 
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0 && "fileip".equals(args[0])) {
@@ -90,15 +74,38 @@ public class UVA11003 {
 
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
 
-		while ((n = readInt()) != 0) {
-			int max = 0;
+		int testcases = readInt();
+
+		while (testcases-- > 0) {
+			int n = readInt();
+			items = new int[n][2];
 			for (int i = 0; i < n; ++i) {
-				weight[i] = readInt();
-				capacity[i] = readInt();
-				max = Math.max(max, weight[i] + capacity[i]);
-				Arrays.fill(memoi[i], -1);
+				items[i][V] = readInt();
+				items[i][W] = readInt();
 			}
-			pw.println(solve(0, max));
+			int g = readInt(), total = 0;
+			Arrays.fill(dp, 0);
+			for (int i = 0; i < n; ++i) {
+				for (int j = 30, jLow = items[i][W]; j >= jLow; --j) {
+					if (j == jLow || dp[j - items[i][W]] > 0) {
+						dp[j] = Math.max(dp[j], items[i][V] + dp[j - items[i][W]]);
+					}
+				}
+			}
+			int[] weights = new int[g];
+			for (int i = 0; i < g; ++i) {
+				weights[i] = readInt();
+			}
+			Arrays.sort(weights);
+			int maxTillNow = 0;
+			for (int i = 0, j = 0; i <= 30; ++i) {
+				maxTillNow = Math.max(maxTillNow, dp[i]);
+				while (j < g && weights[j] == i) {
+					total += maxTillNow;
+					j++;
+				}
+			}
+			pw.println(total);
 		}
 
 		pw.flush();

@@ -83,7 +83,7 @@ public class UVA11003_2 {
 			}
 			int max = 0;
 			for (int i = n - 1; i >= 0; --i) {
-				for (int j = weight[i]+capacity[i], jLimit = weight[i]; j >= jLimit; --j) {
+				for (int j = weight[i] + capacity[i], jLimit = weight[i]; j >= jLimit; --j) {
 					dp[j] = Math.max(dp[j], 1 + dp[Math.min(capacity[i], j - weight[i])]);
 					max = Math.max(max, dp[j]);
 				}
