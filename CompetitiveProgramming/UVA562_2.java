@@ -4,9 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
-public class HelperMethod {
+/**
+ * Dividing coins - Bottom up approach | still a little faster than the top down
+ * approach
+ * 
+ * @author arun
+ *
+ */
+public class UVA562_2 {
 	private static int totalchars = 0, offset = 0;
 	private static InputStream stream;
 	private static byte[] buffer = new byte[1024];
@@ -52,58 +58,10 @@ public class HelperMethod {
 		return sign * val;
 	}
 
-	private static long readLong() {
-		int number = readByte();
-
-		while (eolchar(number))
-			number = readByte();
-
-		int sign = 1;
-		long val = 0;
-
-		if (number == '-') {
-			sign = -1;
-			number = readByte();
-		}
-
-		do {
-			if ((number < '0') || (number > '9')) {
-				// return sign*val;
-				return 0;
-			}
-			val *= 10;
-			val += (number - '0');
-			number = readByte();
-		} while (!eolchar(number));
-
-		return sign * val;
-	}
-
 	private static boolean eolchar(int c) {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
 	}
-	private static final int W = 0, H = 1;
-	static class State {
-		int idx;
-		int totalFlavour;
-		int purchaseAmount;
 
-		public State(int idx, int totalFlavour, int purchaseAmount) {
-			this.idx = idx;
-			this.totalFlavour = totalFlavour;
-			this.purchaseAmount = purchaseAmount;
-		}
-
-		public boolean equals(Object c) {
-			State obj = (State) c;
-			return this.idx == obj.idx && this.totalFlavour == obj.totalFlavour
-					&& this.purchaseAmount == obj.purchaseAmount;
-		}
-
-		public int hashCode() {
-			return idx << 22 | totalFlavour << 15 | purchaseAmount;
-		}
-	}
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0 && "fileip".equals(args[0])) {
 			stream = new FileInputStream(new File("testip.txt"));
@@ -112,13 +70,38 @@ public class HelperMethod {
 		}
 
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
-		ArrayList<Integer> a = new ArrayList<Integer>();
-		a.add(1235);
-		a.add(1234);
-		System.out.println(a.get(0)!=a.get(1));
+
+		int testcases = readInt();
+
+		while (testcases-- > 0) {
+			int n = readInt();
+			int[] coins = new int[n];
+			int total = 0;
+			for (int i = 0; i < n; ++i) {
+				coins[i] = readInt();
+				total += coins[i];
+			}
+			int[] sum = new int[total + 1];
+			int min = total;
+			for (int j = 0; j < n; ++j) {
+				for (int i = total, coin = coins[j]; i >= coin; --i) {
+					if (sum[i - coin] > 0 || i == coin) {
+						int oldSum = sum[i];
+						int newSum = sum[i - coin] + coin;
+						int oldMinDiff = Math.abs(2 * oldSum - total);
+						int newMinDiff = Math.abs(2 * newSum - total);
+						if (newMinDiff < oldMinDiff) {
+							sum[i] = newSum;
+							min = Math.min(newMinDiff, min);
+						}
+					}
+				}
+			}
+
+			pw.println(min);
+		}
 
 		pw.flush();
 		pw.close();
 	}
-
 }

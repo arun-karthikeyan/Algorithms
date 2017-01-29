@@ -4,9 +4,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
-public class HelperMethod {
+/**
+ * Dividing Coins - Subset Equality. Top Down Approach
+ * 
+ * @author arun
+ *
+ */
+public class UVA562 {
 	private static int totalchars = 0, offset = 0;
 	private static InputStream stream;
 	private static byte[] buffer = new byte[1024];
@@ -52,58 +57,22 @@ public class HelperMethod {
 		return sign * val;
 	}
 
-	private static long readLong() {
-		int number = readByte();
-
-		while (eolchar(number))
-			number = readByte();
-
-		int sign = 1;
-		long val = 0;
-
-		if (number == '-') {
-			sign = -1;
-			number = readByte();
-		}
-
-		do {
-			if ((number < '0') || (number > '9')) {
-				// return sign*val;
-				return 0;
-			}
-			val *= 10;
-			val += (number - '0');
-			number = readByte();
-		} while (!eolchar(number));
-
-		return sign * val;
-	}
-
 	private static boolean eolchar(int c) {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
 	}
-	private static final int W = 0, H = 1;
-	static class State {
-		int idx;
-		int totalFlavour;
-		int purchaseAmount;
 
-		public State(int idx, int totalFlavour, int purchaseAmount) {
-			this.idx = idx;
-			this.totalFlavour = totalFlavour;
-			this.purchaseAmount = purchaseAmount;
-		}
+	private static int n, coins[] = new int[100], memoi[][] = new int[100][50001], total;
 
-		public boolean equals(Object c) {
-			State obj = (State) c;
-			return this.idx == obj.idx && this.totalFlavour == obj.totalFlavour
-					&& this.purchaseAmount == obj.purchaseAmount;
+	private static int solve(int idx, int sum) {
+		if (idx == n) {
+			return Math.abs(2 * sum - total);
 		}
-
-		public int hashCode() {
-			return idx << 22 | totalFlavour << 15 | purchaseAmount;
+		if (memoi[idx][sum] == -1) {
+			memoi[idx][sum] = Math.min(solve(idx + 1, coins[idx] + sum), solve(idx + 1, sum));
 		}
+		return memoi[idx][sum];
 	}
+
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0 && "fileip".equals(args[0])) {
 			stream = new FileInputStream(new File("testip.txt"));
@@ -112,13 +81,26 @@ public class HelperMethod {
 		}
 
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
-		ArrayList<Integer> a = new ArrayList<Integer>();
-		a.add(1235);
-		a.add(1234);
-		System.out.println(a.get(0)!=a.get(1));
+
+		int testcases = readInt();
+
+		while (testcases-- > 0) {
+			n = readInt();
+			coins = new int[n];
+			total = 0;
+			for (int i = 0; i < n; ++i) {
+				coins[i] = readInt();
+				total += coins[i];
+			}
+			for (int i = 0; i < n; ++i) {
+				for (int j = 0; j <= total; ++j) {
+					memoi[i][j] = -1;
+				}
+			}
+			pw.println(solve(0, 0));
+		}
 
 		pw.flush();
 		pw.close();
 	}
-
 }
