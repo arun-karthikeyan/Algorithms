@@ -4,14 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 /**
- * e-coins - Top Down Approach
+ * E-Coins | Bottom Up Approach, a tad bit faster than top down
  * 
  * @author arun
  *
  */
-public class UVA10306 {
+public class UVA10306_2 {
 	private static int totalchars = 0, offset = 0;
 	private static InputStream stream;
 	private static byte[] buffer = new byte[1024];
@@ -61,44 +62,6 @@ public class UVA10306 {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
 	}
 
-	static class ECoin {
-		int cVal;
-		int iVal;
-
-		public ECoin(int cVal, int iVal) {
-			this.cVal = cVal;
-			this.iVal = iVal;
-		}
-	}
-
-	private static int[] cCoins, iCoins;
-	private static int MAX, m, s;
-	private static int memo[][][] = new int[41][301][301];
-
-	private static int solve(int idx, int cSum, int iSum) {
-		int newSum = cSum * cSum + iSum * iSum;
-		if (newSum == MAX) {
-			return 0;
-		}
-		if (idx == m) {
-			return 301;
-		}
-		if (memo[idx][cSum][iSum] == -1) {
-			int is = iCoins[idx], cs = cCoins[idx];
-			int min = solve(idx + 1, cSum, iSum);
-			if (is != 0 || cs != 0) {
-				for (int ccs = cs + cSum, cis = is + iSum, overAll = ccs * ccs
-						+ cis * cis, i = 1; overAll <= MAX; ccs += cs, cis += is, overAll = ccs * ccs
-								+ cis * cis, ++i) {
-					min = Math.min(min, i + solve(idx + 1, ccs, cis));
-				}
-			}
-			memo[idx][cSum][iSum] = min;
-		}
-		return memo[idx][cSum][iSum];
-
-	}
-
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0 && "fileip".equals(args[0])) {
 			stream = new FileInputStream(new File("testip.txt"));
@@ -107,32 +70,45 @@ public class UVA10306 {
 		}
 
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
-
-		int testcases = readInt();
 		String notPossible = "not possible";
+		int testcases = readInt();
+		int dp[][] = new int[301][301];
 		while (testcases-- > 0) {
-			m = readInt();
-			s = readInt();
-			MAX = s * s;
-			cCoins = new int[m];
-			iCoins = new int[m];
+			int m = readInt(), s = readInt();
+			int[] cCoins = new int[m];
+			int[] iCoins = new int[m];
 			for (int i = 0; i < m; ++i) {
 				cCoins[i] = readInt();
 				iCoins[i] = readInt();
 			}
+			for (int i = 0; i <= s; ++i) {
+				Arrays.fill(dp[i], 0, s + 1, 0);
+			}
+			int min = 301;
 			for (int i = 0; i < m; ++i) {
-				for (int j = 0; j <= s; ++j) {
-					for (int k = 0; k <= s; ++k) {
-						memo[i][j][k] = -1;
+				if (cCoins[i] > 0 || iCoins[i] > 0) {
+					for (int j = cCoins[i]; j <= s; ++j) {
+						for (int k = iCoins[i]; k <= s; ++k) {
+							if ((j == cCoins[i] && k == iCoins[i]) || (dp[j - cCoins[i]][k - iCoins[i]] > 0)) {
+								if (dp[j][k] > 0) {
+									dp[j][k] = Math.min(dp[j][k], 1 + dp[j - cCoins[i]][k - iCoins[i]]);
+								} else {
+									dp[j][k] = dp[j - cCoins[i]][k - iCoins[i]] + 1;
+								}
+								if (j * j + k * k == s * s) {
+									min = Math.min(min, dp[j][k]);
+								}
+							}
+						}
 					}
 				}
 			}
-			int result = solve(0, 0, 0);
-			if (result > 300) {
+			if (min > 300) {
 				pw.println(notPossible);
 			} else {
-				pw.println(result);
+				pw.println(min);
 			}
+
 		}
 
 		pw.flush();
