@@ -1,0 +1,146 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+
+/**
+ * Graph Connectivity using UF
+ * 
+ * @author arun
+ *
+ */
+
+public class UVA459_2 {
+	/**
+	 * API for Weighted Quick Union with Path Compression
+	 * 
+	 * @author arun
+	 *
+	 */
+	static class UnionFind {
+		/**
+		 * holds the connected component id for the elements
+		 */
+		int[] id;
+
+		/**
+		 * holds the size of the component of containing each element
+		 */
+		int[] sz;
+
+		/**
+		 * keeps count of the number of connected components
+		 */
+		int count;
+
+		/**
+		 * Initializes N sites with integer names 0 to N-1
+		 * 
+		 * @param N
+		 */
+		public UnionFind(int N) {
+			this.id = new int[N];
+			this.sz = new int[N];
+			for (int i = 0; i < N; ++i) {
+				this.id[i] = i;
+				this.sz[i] = 1;
+			}
+			this.count = N;
+
+		}
+
+		/**
+		 * Add a connection between p and q
+		 * 
+		 * @param p
+		 * @param q
+		 */
+		public void union(int p, int q) {
+			int i = find(p);
+			int j = find(q);
+
+			if (i == j) {
+				return;
+			}
+			if (sz[i] < sz[j]) {
+				id[i] = j;
+				sz[j] += sz[i];
+			} else {
+				id[j] = i;
+				sz[i] += sz[j];
+			}
+			this.count--;
+		}
+
+		/**
+		 * component identifier for p (0 to N-1)
+		 * 
+		 * @param p
+		 * @return
+		 */
+		public int find(int p) {
+			if (p == this.id[p]) {
+				return p;
+			}
+			return this.id[p] = find(this.id[p]);
+		}
+
+		/**
+		 * return true if p and q are in the same component
+		 * 
+		 * @param p
+		 * @param q
+		 * @return
+		 */
+		public boolean connected(int p, int q) {
+			return find(p) == find(q);
+		}
+
+		/**
+		 * number of (disjoint) components
+		 * 
+		 * @return
+		 */
+		public int count() {
+			return this.count;
+		}
+
+		/**
+		 * returns the size of the component containing this element
+		 * 
+		 * @param p
+		 * @return
+		 */
+		public int componentSize(int p) {
+			return this.sz[find(p)];
+		}
+	}
+
+	public static void main(String[] args) throws Exception {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		// BufferedReader br = new BufferedReader(new FileReader("testip.txt"));
+		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
+		int testcases = Integer.parseInt(br.readLine());
+		br.readLine();
+		while (testcases-- > 0) {
+			int n = br.readLine().charAt(0) - 'A' + 1;
+			UnionFind uf = new UnionFind(n);
+			String line;
+			while ((line = br.readLine()) != null && line.length() > 0) {
+				int from = line.charAt(0) - 'A', to = line.charAt(1) - 'A';
+				uf.union(from, to);
+			}
+			if (testcases != 0) {
+				pw.println(uf.count() + "\n");
+			} else {
+				pw.println(uf.count());
+			}
+
+		}
+
+		br.close();
+		pw.flush();
+		pw.close();
+	}
+
+}
