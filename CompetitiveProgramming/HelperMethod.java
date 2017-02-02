@@ -82,7 +82,9 @@ public class HelperMethod {
 	private static boolean eolchar(int c) {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
 	}
+
 	private static final int W = 0, H = 1;
+
 	static class State {
 		int idx;
 		int totalFlavour;
@@ -104,19 +106,15 @@ public class HelperMethod {
 			return idx << 22 | totalFlavour << 15 | purchaseAmount;
 		}
 	}
+
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0 && "fileip".equals(args[0])) {
 			stream = new FileInputStream(new File("testip.txt"));
 		} else {
 			stream = System.in;
 		}
-
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
-		ArrayList<Integer> a = new ArrayList<Integer>();
-		a.add(1235);
-		a.add(1234);
-		System.out.println(a.get(0)!=a.get(1));
-
+		pw.println(Integer.toHexString(15));
 		pw.flush();
 		pw.close();
 	}
