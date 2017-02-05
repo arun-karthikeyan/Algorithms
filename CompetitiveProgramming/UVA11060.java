@@ -17,7 +17,7 @@ public class UVA11060 {
 
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		// BufferedReader br = new BufferedReader(new FileReader("testip.txt"));
+//		 BufferedReader br = new BufferedReader(new FileReader("testip.txt"));
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
 		String line;
 		int tc = 1;
