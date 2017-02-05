@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Forwarding Emails, just graph traversal
- * --incomplete--
+ * A tricky modification of DFS
  * @author arun
  *
  */
@@ -62,35 +62,30 @@ public class UVA12442 {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
 	}
 
-	private static ArrayList<Integer> adjList[];
+	private static int[] componentLength, adj, cycle;
 	private static boolean[] visited;
-	private static int[][] componentLength;
-	private static final int LEN = 0, SV = 1;
 	private static int n;
 
-	private static int solve(int sv, int cv) {
-		if (!visited[cv]) {
-			ArrayList<Integer> adj = adjList[cv];
-			int maxLen = 1;
-			visited[cv] = true;
-			componentLength[cv][SV] = sv;
-			for (int i = 0, iLen = adj.size(); i < iLen; ++i) {
-				int av = adj.get(i);
-				if (av == cv) {
-					continue;
-				}
-				maxLen = maxLen + solve(sv, av);
+	private static int solve(int i) {
+		if (componentLength[i] > 0 || visited[i]) {
+			if (visited[i]) {
+				cycle[i] = i;
+				return 0;
 			}
-			componentLength[cv][LEN] = maxLen;
-			return maxLen;
+			if (cycle[i] != -1) {
+				return componentLength[cycle[i]];
+			}
+			return componentLength[i];
 		}
-		if (componentLength[cv][SV] != sv) {
-			return componentLength[cv][LEN];
+		visited[i] = true;
+		componentLength[i] = 1 + solve(adj[i]);
+		visited[i] = false;
+		if (cycle[adj[i]] != -1 && visited[cycle[adj[i]]]) {
+			cycle[i] = cycle[adj[i]];
 		}
-		return 0;
+		return componentLength[i];
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0 && "fileip".equals(args[0])) {
 			stream = new FileInputStream(new File("testip.txt"));
@@ -104,26 +99,22 @@ public class UVA12442 {
 
 		while (testcases-- > 0) {
 			n = readInt();
-			componentLength = new int[n][2];
+			componentLength = new int[n];
+			adj = new int[n];
 			visited = new boolean[n];
-			adjList = new ArrayList[n];
-
-			for (int i = 0; i < n; ++i) {
-				adjList[i] = new ArrayList<Integer>();
-			}
-
+			cycle = new int[n];
+			Arrays.fill(cycle, -1);
 			for (int i = 0; i < n; ++i) {
 				int from = readInt() - 1, to = readInt() - 1;
-				adjList[from].add(to);
+				adj[from] = to;
 			}
+
+			int max = 0, maxIdx = -1;
 			for (int i = 0; i < n; ++i) {
 				// fill max length of component starting at i
-				solve(i, i);
-			}
-			int max = componentLength[0][LEN], maxIdx = 1;
-			for (int i = 1; i < n; ++i) {
-				if (max < componentLength[i][LEN]) {
-					max = componentLength[i][LEN];
+				solve(i);
+				if (max < componentLength[i]) {
+					max = componentLength[i];
 					maxIdx = i + 1;
 				}
 			}
