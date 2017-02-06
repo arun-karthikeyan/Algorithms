@@ -4,15 +4,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
- * Forwarding Emails, just graph traversal A tricky modification of DFS
+ * Ordering Tasks
  * 
  * @author arun
  *
  */
-public class UVA12442 {
+public class UVA10305 {
 	private static int totalchars = 0, offset = 0;
 	private static InputStream stream;
 	private static byte[] buffer = new byte[1024];
@@ -62,30 +65,23 @@ public class UVA12442 {
 		return c == ' ' || c == '\n' || c == -1 || c == '\r' || c == '\t';
 	}
 
-	private static int[] componentLength, adj, cycle;
+	private static Queue<Integer> result;
+	private static ArrayList<Integer>[] adjList;
 	private static boolean[] visited;
-	private static int n;
 
-	private static int solve(int i) {
-		if (componentLength[i] > 0 || visited[i]) {
-			if (visited[i]) {
-				cycle[i] = i;
-				return 0;
+	private static void solve(int v) {
+		ArrayList<Integer> adj = adjList[v];
+		visited[v] = true;
+		for (int i = 0, iLen = adj.size(); i < iLen; ++i) {
+			int av = adj.get(i);
+			if (!visited[av]) {
+				solve(av);
 			}
-			if (cycle[i] != -1) {
-				return componentLength[cycle[i]];
-			}
-			return componentLength[i];
 		}
-		visited[i] = true;
-		componentLength[i] = 1 + solve(adj[i]);
-		visited[i] = false;
-		if (cycle[adj[i]] != -1 && visited[cycle[adj[i]]]) {
-			cycle[i] = cycle[adj[i]];
-		}
-		return componentLength[i];
+		result.add(v);
 	}
 
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0 && "fileip".equals(args[0])) {
 			stream = new FileInputStream(new File("testip.txt"));
@@ -95,32 +91,35 @@ public class UVA12442 {
 
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
 
-		int testcases = readInt(), tc = 1;
-
-		while (testcases-- > 0) {
+		int n, m;
+		while (true) {
 			n = readInt();
-			componentLength = new int[n];
-			adj = new int[n];
-			visited = new boolean[n];
-			cycle = new int[n];
-			Arrays.fill(cycle, -1);
-			for (int i = 0; i < n; ++i) {
-				int from = readInt() - 1, to = readInt() - 1;
-				adj[from] = to;
+			m = readInt();
+			if (n == 0 && m == 0) {
+				break;
 			}
-
-			int max = 0, maxIdx = -1;
+			adjList = new ArrayList[n];
 			for (int i = 0; i < n; ++i) {
-				// fill max length of component starting at i
-				solve(i);
-				if (max < componentLength[i]) {
-					max = componentLength[i];
-					maxIdx = i + 1;
+				adjList[i] = new ArrayList<Integer>();
+			}
+			visited = new boolean[n];
+			result = new LinkedList<Integer>();
+			for (int i = 0; i < m; ++i) {
+				int dependent = readInt() - 1, dependee = readInt() - 1;
+				adjList[dependee].add(dependent);
+			}
+			for (int i = 0; i < n; ++i) {
+				if (!visited[i]) {
+					solve(i);
 				}
 			}
-			pw.println("Case " + (tc++) + ": " + maxIdx);
+			Iterator<Integer> resultIterator = result.iterator();
+			pw.print(resultIterator.next() + 1);
+			while (resultIterator.hasNext()) {
+				pw.print(" " + (resultIterator.next() + 1));
+			}
+			pw.println();
 		}
-
 		pw.flush();
 		pw.close();
 	}
