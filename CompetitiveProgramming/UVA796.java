@@ -10,9 +10,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 /**
- * Critical Links - Identifying bridges, I've used Tarjan's algorithm. I'm
- * getting WA, but I'm not sure why, weird!
- * 
+ * Critical Links - Identifying bridges, I've used Tarjan's algorithm.
+ * O(V + E) solution, with modified dfs.
  * @author arun
  *
  */
@@ -91,7 +90,7 @@ public class UVA796 {
 				}
 			} else {
 				if (dfsParent[u] != av) {
-					dfsLow[u] = Math.min(dfsLow[av], dfsNum[u]);
+					dfsLow[u] = Math.min(dfsLow[av], dfsLow[u]);
 				}
 			}
 		}
