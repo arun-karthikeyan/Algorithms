@@ -65,7 +65,7 @@ public class UVA315 {
 				Arrays.fill(adjMat[i], 0, n, false);
 			}
 			while (true) {
-				String info[] = br.readLine().split(" ");
+				String info[] = br.readLine().split("\\s+");
 				int from = Integer.parseInt(info[0]);
 				if (from == 0) {
 					break;

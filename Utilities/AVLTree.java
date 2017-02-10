@@ -339,7 +339,7 @@ public class AVLTree<E extends Comparable<E>> {
 	public static void main(String[] args) {
 		System.out.println("Started...");
 		int MAX = Integer.MAX_VALUE;
-		int N = (int) 1e6;
+		int N = (int) 2e3;
 		AVLTree<Integer> avl;
 		// do{
 		totalAdd = 0l;
